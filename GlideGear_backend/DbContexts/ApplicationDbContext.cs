@@ -27,13 +27,13 @@ namespace GlideGear_backend.DbContexts
             modelBuilder.Entity<User>()
                 .Property(e => e.Role)
                 .HasDefaultValue("user");
+            modelBuilder.Entity<Product>()
+                .Property(pr => pr.Price).
+                HasPrecision(18, 2);
             modelBuilder.Entity<Category>()
                 .HasMany(c => c.Products)
                 .WithOne(c => c.Category)
                 .HasForeignKey(x => x.CategoryId);
         }
-
-        
-
     }
 }

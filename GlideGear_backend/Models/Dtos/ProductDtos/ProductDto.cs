@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GlideGear_backend.Models
+namespace GlideGear_backend.Models.Dtos.ProductDtos
 {
-    public class Product
+    public class ProductDto
     {
-        public int ProductId { get; set; }
+       
         [Required]
         public string Title { get; set; }
         [Required]
@@ -12,11 +12,8 @@ namespace GlideGear_backend.Models
         [Required]
 
         public decimal Price { get; set; }
-        [Required]
-        public string Img { get; set; }
+
         [Required]
         public int CategoryId { get; set; }
-        public virtual Category Category { get; set; }
-
     }
 }

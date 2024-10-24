@@ -1,10 +1,12 @@
-
 using GlideGear_backend.DbContexts;
 using GlideGear_backend.Mapper;
 using GlideGear_backend.Services.CategoryServices;
+using GlideGear_backend.Services.ProductServices;
 using GlideGear_backend.Services.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text;
 
 namespace GlideGear_backend
@@ -16,23 +18,53 @@ namespace GlideGear_backend
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
 
-            
+            // Add Swagger/OpenAPI with JWT Authentication
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "GlideGear API", Version = "v1" });
+
+                // Configure Swagger to use the JWT Bearer token
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter 'Bearer' [space] followed by your token in the text input below.\n\nExample: \"Bearer your-token\"",
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+
+               
+            });
+
+            // Register DbContext and Services
             builder.Services.AddDbContext<ApplicationDbContext>();
             builder.Services.AddAutoMapper(typeof(MapperProfile));
 
-            //_______Service class registration_____
+            // Service class registration
+            builder.Services.AddScoped<IUserServices, UserServices>();
+            builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+            builder.Services.AddScoped<IProductServices, ProductService>();
 
-            builder.Services.AddScoped<IUserServices,UserServices>();
-            builder.Services.AddScoped<ICategoryServices,CategoryServices>();
-
-            //Jwt authentication
-
+            // JWT Authentication
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -51,12 +83,9 @@ namespace GlideGear_backend
                 };
             });
 
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-
-
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -67,7 +96,6 @@ namespace GlideGear_backend
 
             app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 

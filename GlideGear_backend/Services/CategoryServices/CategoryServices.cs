@@ -11,10 +11,12 @@ namespace GlideGear_backend.Services.CategoryServices
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+      
         public CategoryServices(ApplicationDbContext context,IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
+        
         }
 
         public async Task<List<CategoryDto>> getCategories()
@@ -26,7 +28,7 @@ namespace GlideGear_backend.Services.CategoryServices
         public async Task<bool> AddCategory(CategoryDto categoryDto)
         {
             var isExist = await _context.Categories.AnyAsync(x => x.Name.ToLower() == categoryDto.Name.ToLower());
-            if (isExist)
+            if (!isExist)
             {
                 var d = _mapper.Map<Category>(categoryDto);
                 await _context.Categories.AddAsync(d);
@@ -39,7 +41,7 @@ namespace GlideGear_backend.Services.CategoryServices
 
         public async Task<bool> RemoveCategory(int id)
         {
-            var res=await _context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+            var res=await _context.Categories.FirstOrDefaultAsync(x => x.CategoryId == id);
             if(res == null)
             {
                 return false;
