@@ -1,6 +1,7 @@
 
 using GlideGear_backend.DbContexts;
 using GlideGear_backend.Mapper;
+using GlideGear_backend.Services.CategoryServices;
 using GlideGear_backend.Services.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -28,6 +29,7 @@ namespace GlideGear_backend
             //_______Service class registration_____
 
             builder.Services.AddScoped<IUserServices,UserServices>();
+            builder.Services.AddScoped<ICategoryServices,CategoryServices>();
 
             //Jwt authentication
 
@@ -63,8 +65,8 @@ namespace GlideGear_backend
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
 
 
             app.MapControllers();

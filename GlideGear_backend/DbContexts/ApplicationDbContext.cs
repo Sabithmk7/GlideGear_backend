@@ -10,6 +10,14 @@ namespace GlideGear_backend.DbContexts
         {
             connectionString = configuration["ConnectionStrings:DefaultConnection"];
         }
+
+        //DbSets
+        public DbSet<User> Users { get; set; }
+        public DbSet<Product> Products { get; set; } 
+        public DbSet<Category> Categories { get; set; }
+
+
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(connectionString);
@@ -19,9 +27,13 @@ namespace GlideGear_backend.DbContexts
             modelBuilder.Entity<User>()
                 .Property(e => e.Role)
                 .HasDefaultValue("user");
+            modelBuilder.Entity<Category>()
+                .HasMany(c => c.Products)
+                .WithOne(c => c.Category)
+                .HasForeignKey(x => x.CategoryId);
         }
 
-        public DbSet<User> Users { get; set; }
+        
 
     }
 }

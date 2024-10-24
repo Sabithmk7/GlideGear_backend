@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GlideGear_backend.Models.Dtos
+namespace GlideGear_backend.Models.Dtos.UserDtos
 {
     public class UserRegistrationDto
     {

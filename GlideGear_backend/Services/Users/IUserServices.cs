@@ -1,5 +1,5 @@
 ﻿using GlideGear_backend.Models;
-using GlideGear_backend.Models.Dtos;
+using GlideGear_backend.Models.Dtos.UserDtos;
 
 namespace GlideGear_backend.Services.Users
 {

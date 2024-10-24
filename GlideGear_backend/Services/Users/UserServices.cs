@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using GlideGear_backend.DbContexts;
 using GlideGear_backend.Models;
-using GlideGear_backend.Models.Dtos;
+using GlideGear_backend.Models.Dtos.UserDtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -24,8 +24,14 @@ namespace GlideGear_backend.Services.Users
 
         public async Task<List<UserViewDto>> GetUsers()
         {
-            var u= await _context.Users.ToListAsync();
-            return _mapper.Map<List<UserViewDto>>(u);
+            try
+            {
+                var u = await _context.Users.ToListAsync();
+                return _mapper.Map<List<UserViewDto>>(u);
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
         public async Task<string> Register(UserRegistrationDto newUser)
         {

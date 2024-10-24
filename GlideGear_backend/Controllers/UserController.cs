@@ -1,5 +1,6 @@
-﻿using GlideGear_backend.Models.Dtos;
+﻿using GlideGear_backend.Models.Dtos.UserDtos;
 using GlideGear_backend.Services.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,12 +15,19 @@ namespace GlideGear_backend.Controllers
         {
             _userServices = userServices;
         }
-
+        [Authorize(Roles ="admin")]
         [HttpGet("getusers")]
+       
         public async Task<IActionResult> getUsers()
         {
-            var users= await _userServices.GetUsers();
-            return Ok(users);
+            try
+            {
+                var users = await _userServices.GetUsers();
+                return Ok(users);
+            }catch(Exception ex)
+            {
+                return Unauthorized(ex.Message);
+            }
         }
 
         [HttpPost("Register")]
@@ -39,7 +47,7 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var token = _userServices.Login(login);
+                var token =await _userServices.Login(login);
                 return Ok(new {Token=token});
             }catch(Exception ex)
             {
