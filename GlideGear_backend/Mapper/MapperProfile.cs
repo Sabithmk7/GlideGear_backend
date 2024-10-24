@@ -9,6 +9,7 @@ namespace GlideGear_backend.Mapper
         public MapperProfile()
         {
             CreateMap<User,UserRegistrationDto>().ReverseMap();
+            CreateMap<User, UserViewDto>().ReverseMap();
         }
     }
 }

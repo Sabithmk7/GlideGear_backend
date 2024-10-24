@@ -3,6 +3,10 @@ using GlideGear_backend.DbContexts;
 using GlideGear_backend.Models;
 using GlideGear_backend.Models.Dtos;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace GlideGear_backend.Services.Users
 {
@@ -10,10 +14,18 @@ namespace GlideGear_backend.Services.Users
     {
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
-        public UserServices(ApplicationDbContext context,IMapper mapper)
+        private readonly IConfiguration _configuration;
+        public UserServices(ApplicationDbContext context,IMapper mapper, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
+            _configuration = configuration;
+        }
+
+        public async Task<List<UserViewDto>> GetUsers()
+        {
+            var u= await _context.Users.ToListAsync();
+            return _mapper.Map<List<UserViewDto>>(u);
         }
         public async Task<string> Register(UserRegistrationDto newUser)
         {
@@ -35,7 +47,6 @@ namespace GlideGear_backend.Services.Users
             }
             catch (DbUpdateException dbEx)
             {
-                // Log the detailed exception
                 throw new Exception($"Database error: {dbEx.InnerException?.Message ?? dbEx.Message}");
             }
             catch (Exception ex)
@@ -44,10 +55,49 @@ namespace GlideGear_backend.Services.Users
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<User> Login(LoginDto user)
+        public async Task<String> Login(LoginDto user)
         {
             var u = await _context.Users.SingleOrDefaultAsync(x => x.Email == user.Email);
-            return u;
+            if(u == null || !ValidatePassword(user.Password,u.Password))
+            {
+                throw new InvalidOperationException("Invalid email or password");
+            }
+
+            var uToken=GenerateToken(u);
+            return uToken;
+        }
+
+
+
+        //Token Generation
+
+        private string GenerateToken(User user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var credentails = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claim = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier ,user.Id.ToString()),
+                new Claim(ClaimTypes.Name,user.UserName ),
+                new Claim(ClaimTypes.Role,user.Role),
+                new Claim(ClaimTypes.Email,user.Email)
+            };
+
+            var token = new JwtSecurityToken(
+                claims:claim,
+                signingCredentials: credentails,
+                expires:DateTime.UtcNow.AddHours(2)
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+
+        //Bcrypt password verification
+        private bool ValidatePassword(string password,string hashPassword)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hashPassword);
         }
     }
 }
