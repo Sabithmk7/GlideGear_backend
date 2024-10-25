@@ -2,6 +2,7 @@
 using GlideGear_backend.DbContexts;
 using GlideGear_backend.Models;
 using GlideGear_backend.Models.Dtos.ProductDtos;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GlideGear_backend.Services.ProductServices
@@ -11,14 +12,44 @@ namespace GlideGear_backend.Services.ProductServices
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public ProductService(ApplicationDbContext context,IMapper mapper,IWebHostEnvironment webHostEnvironment)
+        private readonly string HostUrl;
+        public ProductService(ApplicationDbContext context,IMapper mapper,IWebHostEnvironment webHostEnvironment,IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
+            HostUrl = configuration["HostUrl:url"];
+        }
+
+        public async Task<List<ProductViewDto>> GetProducts()
+        {
+            try
+            {
+                var p = await _context.Products.Include(x => x.Category).ToListAsync();
+                if (p.Count > 0)
+                {
+                    var productWithCategory = p.Select(p => new ProductViewDto
+                    {
+                        Id = p.ProductId,
+                        ProductName = p.Title,
+                        ProductDescription = p.Description,
+                        Price = p.Price,
+                        ProductImage = HostUrl + p.Img,
+                        Category = p.Category.Name
+                    }
+                    ).ToList();
+                    return productWithCategory;
+
+                }
+                return [];
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
         public async Task AddProduct(ProductDto product, IFormFile image)
         {
+           
             try
             {
                 string? imageUrl = null;

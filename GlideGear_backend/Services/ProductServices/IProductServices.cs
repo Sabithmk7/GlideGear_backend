@@ -5,5 +5,6 @@ namespace GlideGear_backend.Services.ProductServices
     public interface IProductServices
     {
         Task AddProduct(ProductDto product,IFormFile image);
+        Task<List<ProductViewDto>> GetProducts();
     }
 }

@@ -17,10 +17,24 @@ namespace GlideGear_backend.Controllers
             _services = services;
         }
 
+        [HttpGet("getAllProducts")]
+        public async Task<IActionResult> GetAllProducts()
+        {
+            try
+            {
+                var products = await _services.GetProducts();
+                return Ok(products);
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [Authorize(Roles ="admin")]
         [HttpPost]
         public async Task<IActionResult> AddProduct([FromForm] ProductDto productDto, IFormFile image)
         {
+
             try
             {
                 await _services.AddProduct(productDto, image);

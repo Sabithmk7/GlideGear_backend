@@ -4,9 +4,9 @@ namespace GlideGear_backend.Models.Dtos
 {
     public class AddProductDto
     {
-        [Required]
+        [Required(ErrorMessage = "Product title is required.")]
         public string Title { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Product description is required.")]
         public string Description { get; set; }
         [Required]
         public decimal Price { get; set; }

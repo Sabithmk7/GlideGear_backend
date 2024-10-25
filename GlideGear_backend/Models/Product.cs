@@ -5,18 +5,19 @@ namespace GlideGear_backend.Models
     public class Product
     {
         public int ProductId { get; set; }
-        [Required]
-        public string Title { get; set; }
-        [Required]
-        public string Description { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Product name is required.")]
+        public string? Title { get; set; }
+        [Required(ErrorMessage = "Product description is required.")]
+        public string? Description { get; set; }
 
-        public decimal Price { get; set; }
         [Required]
-        public string Img { get; set; }
+        public decimal Price { get; set; }
+        [Required(ErrorMessage = "Image URL is required.")]
+        [Url(ErrorMessage = "Invalid URL format.")]
+        public string? Img { get; set; }
         [Required]
         public int CategoryId { get; set; }
-        public virtual Category Category { get; set; }
+        public virtual Category? Category { get; set; }
 
     }
 }
