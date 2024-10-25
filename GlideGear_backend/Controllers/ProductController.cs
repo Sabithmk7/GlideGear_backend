@@ -17,7 +17,7 @@ namespace GlideGear_backend.Controllers
             _services = services;
         }
 
-        [HttpGet("getAllProducts")]
+        [HttpGet("All")]
         public async Task<IActionResult> GetAllProducts()
         {
             try
@@ -26,7 +26,49 @@ namespace GlideGear_backend.Controllers
                 return Ok(products);
             }catch(Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpGet("GetById/{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            try
+            {
+                var p = await _services.GetProductById(id);
+                return Ok(p);
+            }catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpGet("getByCategory")]
+        public async Task<IActionResult> GetByCategory(string categoryName)
+        {
+            try
+            {
+                var p = await _services.GetProductByCategory(categoryName);
+                return Ok(p);
+            }catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            try
+            {
+                bool res = await _services.DeleteProduct(id);
+                if (res)
+                {
+                    return Ok("Product deleted succesfully");
+                }
+                return BadRequest("No product found");
+                
+            }catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -46,9 +88,46 @@ namespace GlideGear_backend.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProduct(int id,[FromForm]ProductDto productDto,IFormFile image)
+        {
+            try
+            {
+                await _services.UpdateProduct(id, productDto, image);
+                return Ok("Updated seccefully");
+            }catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpGet("search-item")]
+        public async Task<IActionResult> SearchProduct(string search)
+        {
+            try
+            {
+                var res = await _services.SearchProduct(search);
+                return Ok(res);
+            }catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("paginated-products")]
+        public async Task<IActionResult> pagination([FromQuery]int pageNumber=1, [FromQuery] int size=10)
+        {
+            try
+            {
+                var res = await _services.ProductPagination(pageNumber, size);
+                return Ok(res);
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

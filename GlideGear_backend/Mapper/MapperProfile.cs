@@ -14,6 +14,7 @@ namespace GlideGear_backend.Mapper
             CreateMap<User, UserViewDto>().ReverseMap();
             CreateMap<CategoryDto,Category>().ReverseMap();
             CreateMap<ProductDto,Product>().ReverseMap();
+            CreateMap<ProductViewDto, Product>().ReverseMap();  
         }
     }
 }

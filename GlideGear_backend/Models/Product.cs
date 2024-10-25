@@ -18,6 +18,7 @@ namespace GlideGear_backend.Models
         [Required]
         public int CategoryId { get; set; }
         public virtual Category? Category { get; set; }
+        public virtual List<CartItem>? CartItems { get; set; }
 
     }
 }

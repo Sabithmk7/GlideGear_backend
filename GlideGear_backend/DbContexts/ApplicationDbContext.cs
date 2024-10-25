@@ -15,6 +15,8 @@ namespace GlideGear_backend.DbContexts
         public DbSet<User> Users { get; set; }
         public DbSet<Product> Products { get; set; } 
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
 
 
 
@@ -34,6 +36,23 @@ namespace GlideGear_backend.DbContexts
                 .HasMany(c => c.Products)
                 .WithOne(c => c.Category)
                 .HasForeignKey(x => x.CategoryId);
+            modelBuilder.Entity<User>()
+              .HasOne(u => u.Cart)
+              .WithOne(c => c.User)
+              .HasForeignKey<Cart>(c => c.UserId);
+            modelBuilder.Entity<Cart>()
+                .HasMany(x=>x.CartItems)
+                .WithOne(c=>c.Cart)
+                .HasForeignKey(i=>i.CartId);
+            modelBuilder.Entity<CartItem>()
+                .HasOne(c=>c.Product)
+                .WithMany(i => i.CartItems)
+                .HasForeignKey(k=>k.ProductId);
+                
+                  
+
+
+
         }
     }
 }
