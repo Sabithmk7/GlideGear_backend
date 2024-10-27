@@ -2,7 +2,7 @@
 
 namespace GlideGear_backend.Models.Order_Model
 {
-    public class Order
+    public class OrderMain
     {
         public int Id { get; set; }
         [Required]

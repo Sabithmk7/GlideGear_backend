@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using GlideGear_backend.Models.Order_Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace GlideGear_backend.Models
 {
@@ -19,5 +20,6 @@ namespace GlideGear_backend.Models
 
         public string? Role {  get; set; }
         public virtual Cart? Cart { get; set; }
+        public virtual List<OrderMain> Orders { get; set; }
     }
 }

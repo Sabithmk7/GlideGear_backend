@@ -15,9 +15,7 @@ namespace GlideGear_backend.Models.Order_Model
         [Required]
         public int Quantity { get; set; }
 
-
-
-        public virtual Order? Orders { get; set; }
+        public virtual OrderMain? Orders { get; set; }
         public virtual Product? Product { get; set; }
     }
 }

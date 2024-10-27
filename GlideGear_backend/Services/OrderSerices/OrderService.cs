@@ -2,7 +2,9 @@
 using GlideGear_backend.Models.Order_Model;
 using GlideGear_backend.Models.Order_Model.Dtos;
 using GlideGear_backend.Services.JwtService;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
+using Razorpay.Api;
 
 namespace GlideGear_backend.Services.OrderSerices
 {
@@ -19,6 +21,60 @@ namespace GlideGear_backend.Services.OrderSerices
             _jwtServices = jwtServices;
             HostUrl = _configuration["Host:Url"];
         }
+
+        public async Task<string> RazorOrderCreate(long price)
+        {
+            Dictionary<string, object> input = new Dictionary<string, object>();
+            Random random = new Random();
+            string TrasactionId = random.Next(0, 1000).ToString();
+            input.Add("amount", Convert.ToDecimal(price) * 100);
+            input.Add("currency", "INR");
+            input.Add("receipt", TrasactionId);
+
+            string key = _configuration["Razorpay:KeyId"];
+            string secret = _configuration["Razorpay:KeySecret"];
+
+            RazorpayClient client = new RazorpayClient(key, secret);
+            Razorpay.Api.Order order = client.Order.Create(input);
+            var OrderId = order["id"].ToString();
+
+            return OrderId;
+
+        }
+
+        public bool RazorPayment(PaymentDto payment)
+        {
+            if (payment == null ||
+                string.IsNullOrEmpty(payment.razorpay_payment_id) ||
+                string.IsNullOrEmpty(payment.razorpay_order_id) ||
+                string.IsNullOrEmpty(payment.razorpay_signature))
+            {
+                return false;
+            }
+
+            try
+            {
+                RazorpayClient client = new RazorpayClient(
+                    _configuration["Razorpay:KeyId"],
+                    _configuration["Razorpay:KeySecret"]
+                );
+
+                Dictionary<string, string> attributes = new Dictionary<string, string>
+                {
+                    { "razorpay_payment_id", payment.razorpay_payment_id },
+                    { "razorpay_order_id", payment.razorpay_order_id },
+                    { "razorpay_signature", payment.razorpay_signature }
+                };
+
+                Utils.verifyPaymentSignature(attributes);
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("Payment verification failed: " + ex.Message);
+            }
+        }
         public async Task<bool> CreateOrder(string token, CreateOrderDto createOrderDto)
         {
             try
@@ -34,7 +90,7 @@ namespace GlideGear_backend.Services.OrderSerices
                 }
 
                 var cart = await _context.Carts.Include(c => c.CartItems).ThenInclude(p => p.Product).FirstOrDefaultAsync(u => u.UserId == userId);
-                var order = new Order
+                var order = new OrderMain
                 {
                     userId = userId,
                     OrderDate = DateTime.Now,
@@ -93,6 +149,63 @@ namespace GlideGear_backend.Services.OrderSerices
                 }
             }
             return OrderDetails;
+        }
+
+        public async Task<List<OrderAdminViewDto>> GetOrderDetailsAdmin()
+        {
+            var orders = await _context.Orders.Include(oi => oi.OrderItems).ToListAsync();
+
+            if(orders.Count != 0)
+            {
+                var orderDetails = orders.Select(o => new OrderAdminViewDto 
+                {
+                    Id=o.Id,
+                    CustomerEmail = o.CustomerEmail,
+                    CustomerName = o.CustomerName,
+                    OrderId = o.OrderString,
+                    TransactionId = o.TransactionId,
+                    OrderDate = o.OrderDate,
+                    OrderStatus = o.OrderStatus
+                }).ToList();
+                return orderDetails;
+            }
+            return new List<OrderAdminViewDto>();
+        }
+
+        public async Task<decimal> TotalRevenue()
+        {
+            try
+            {
+                var total = await _context.OrderItems.SumAsync(itm=>itm.TotalPrice);
+                return total;
+            }catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<int> TotalProductsPurchased()
+        {
+            try
+            {
+                var totalP=await _context.OrderItems.SumAsync(i=>i.Quantity);
+                return totalP;
+            }catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> UpdateOrderStatus(int orderId, UpdateOrderStatusDto value)
+        {
+            var order=await _context.Orders.FindAsync(orderId);
+
+            if (order != null)
+            {
+                order.OrderStatus = value.OrderStatus;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
     }
 }

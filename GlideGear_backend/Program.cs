@@ -4,6 +4,7 @@ using GlideGear_backend.Mapper;
 using GlideGear_backend.Services.CartServices;
 using GlideGear_backend.Services.CategoryServices;
 using GlideGear_backend.Services.JwtService;
+using GlideGear_backend.Services.OrderSerices;
 using GlideGear_backend.Services.ProductServices;
 using GlideGear_backend.Services.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -36,6 +37,7 @@ namespace GlideGear_backend
             builder.Services.AddScoped<IProductServices,ProductService>();
             builder.Services.AddScoped<IJwtServices, JwtServices>();
             builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
 
             //Jwt authentication
 
