@@ -1,12 +1,14 @@
 
 using GlideGear_backend.DbContexts;
 using GlideGear_backend.Mapper;
+using GlideGear_backend.Middleware;
 using GlideGear_backend.Services.CartServices;
 using GlideGear_backend.Services.CategoryServices;
 using GlideGear_backend.Services.JwtService;
 using GlideGear_backend.Services.OrderSerices;
 using GlideGear_backend.Services.ProductServices;
 using GlideGear_backend.Services.Users;
+using GlideGear_backend.Services.UserServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -32,7 +34,8 @@ namespace GlideGear_backend
 
             //_______Service class registration_____
 
-            builder.Services.AddScoped<IUserServices,UserServices>();
+            builder.Services.AddScoped<IAuthServices,AuthSevices>();
+            builder.Services.AddScoped<IUserService,UserService>();
             builder.Services.AddScoped<ICategoryServices,CategoryServices>();
             builder.Services.AddScoped<IProductServices,ProductService>();
             builder.Services.AddScoped<IJwtServices, JwtServices>();
@@ -70,7 +73,7 @@ namespace GlideGear_backend
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseMiddleware<JwtCookieMiddleware>();
             app.UseStaticFiles();
             app.UseHttpsRedirection();
 

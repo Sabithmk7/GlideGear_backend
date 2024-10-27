@@ -20,11 +20,11 @@ namespace GlideGear_backend.Services.CartServices
             _logger = logger;
         }
 
-        public async Task<List<CartViewDto>> GetCartItems(string token)
+        public async Task<List<CartViewDto>> GetCartItems(int userId)
         {
             try
             {
-                int userId = _jwtServices.GetUserIdFromToken(token);
+                
                 if (userId == 0)
                 {
                     throw new Exception("User id is null");
@@ -53,11 +53,10 @@ namespace GlideGear_backend.Services.CartServices
             }
         }
 
-        public async Task<bool> AddToCart(string token, int productId)
+        public async Task<bool> AddToCart(int userId, int productId)
         {
             try
             {
-                var userId = _jwtServices.GetUserIdFromToken(token);
                 var user = await _context.Users.Include(c => c.Cart)
                                 .ThenInclude(ci => ci.CartItems)
                                 .ThenInclude(p => p.Product)
@@ -96,11 +95,11 @@ namespace GlideGear_backend.Services.CartServices
             }
         }
 
-        public async Task<bool> RemoveFromCart(string token, int productId)
+        public async Task<bool> RemoveFromCart(int userId, int productId)
         {
             try
             {
-                var userId = _jwtServices.GetUserIdFromToken(token);
+                
                 var user = await _context.Users.Include(c => c.Cart)
                                     .ThenInclude(ci => ci.CartItems)
                                     .ThenInclude(p => p.Product)
@@ -127,11 +126,11 @@ namespace GlideGear_backend.Services.CartServices
 
         }
 
-        public async Task<bool> IncreaseQuantity(string token, int productId)
+        public async Task<bool> IncreaseQuantity(int userId, int productId)
         {
             try
             {
-                var userId = _jwtServices.GetUserIdFromToken(token);
+              
                 var user = await _context.Users.Include(c => c.Cart)
                                     .ThenInclude(ci => ci.CartItems)
                                     .ThenInclude(p => p.Product)
@@ -157,11 +156,11 @@ namespace GlideGear_backend.Services.CartServices
             }
         }
 
-        public async Task<bool> DecreaseQuantity(string token, int productId)
+        public async Task<bool> DecreaseQuantity(int userId, int productId)
         {
             try
             {
-                var userId = _jwtServices.GetUserIdFromToken(token);
+                
                 var user = await _context.Users.Include(c => c.Cart)
                                     .ThenInclude(ci => ci.CartItems)
                                     .ThenInclude(p => p.Product)

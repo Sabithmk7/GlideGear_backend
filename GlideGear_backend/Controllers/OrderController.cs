@@ -132,7 +132,7 @@ namespace GlideGear_backend.Controllers
             }
         }
 
-        [HttpGet("totalProducts")]
+        [HttpGet("totalProductsPurchased")]
 
         public async Task<ActionResult> TotalProducts()
         {

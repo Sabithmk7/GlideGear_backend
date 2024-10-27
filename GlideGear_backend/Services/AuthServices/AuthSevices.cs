@@ -10,29 +10,19 @@ using System.Text;
 
 namespace GlideGear_backend.Services.Users
 {
-    public class UserServices:IUserServices
+    public class AuthSevices:IAuthServices
     {
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
-        public UserServices(ApplicationDbContext context,IMapper mapper, IConfiguration configuration)
+        public AuthSevices(ApplicationDbContext context,IMapper mapper, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
             _configuration = configuration;
         }
 
-        public async Task<List<UserViewDto>> GetUsers()
-        {
-            try
-            {
-                var u = await _context.Users.ToListAsync();
-                return _mapper.Map<List<UserViewDto>>(u);
-            }catch(Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
+        
         public async Task<string> Register(UserRegistrationDto newUser)
         {
             try

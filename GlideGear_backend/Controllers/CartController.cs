@@ -1,7 +1,9 @@
 ﻿using GlideGear_backend.Models.Dtos;
 using GlideGear_backend.Services.CartServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace GlideGear_backend.Controllers
 {
@@ -15,15 +17,20 @@ namespace GlideGear_backend.Controllers
             _cartService = cartService;
         }
         [HttpGet("all")]
+        [Authorize]
         public async Task<IActionResult> GetItems()
         {
             try
             {
-                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-                var splitToken = token?.Split(' ');
-                var jwtToken = splitToken?[1];
+                
 
-                var res = await _cartService.GetCartItems(jwtToken);
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdString, out int userId))
+                {
+                    return BadRequest("Invalid user ID.");
+                }
+
+                var res = await _cartService.GetCartItems(userId);
                 return Ok(res);
             }catch (Exception ex)
             {
@@ -36,11 +43,13 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-                var splitToken = token?.Split(' ');
-                var jwtToken = splitToken?[1];
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdString, out int userId))
+                {
+                    return BadRequest("Invalid user ID.");
+                }
 
-                bool res=await _cartService.AddToCart(jwtToken, productId);
+                bool res=await _cartService.AddToCart(userId, productId);
                 if (res == true)
                 {
                     return Ok("Product added to cart succesfully");
@@ -58,11 +67,13 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-                var splitToken = token?.Split(' ');
-                var jwtToken = splitToken?[1];
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdString, out int userId))
+                {
+                    return BadRequest("Invalid user ID.");
+                }
 
-                bool res = await _cartService.RemoveFromCart(jwtToken, productId);
+                bool res = await _cartService.RemoveFromCart(userId, productId);
                 if (res == false)
                 {
                     return BadRequest("Item is not found in cart");
@@ -79,11 +90,13 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-                var splitToken = token?.Split(' ');
-                var jwtToken = splitToken?[1];
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdString, out int userId))
+                {
+                    return BadRequest("Invalid user ID.");
+                }
 
-                bool res=await _cartService.IncreaseQuantity(jwtToken, productId);
+                bool res=await _cartService.IncreaseQuantity(userId, productId);
                 if(res == false)
                 {
                     return BadRequest("Item not found in the cart");
@@ -101,11 +114,13 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-                var splitToken = token?.Split(' ');
-                var jwtToken = splitToken?[1];
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdString, out int userId))
+                {
+                    return BadRequest("Invalid user ID.");
+                }
 
-                bool res = await _cartService.DecreaseQuantity(jwtToken, productId);
+                bool res = await _cartService.DecreaseQuantity(userId, productId);
                 if (res == false)
                 {
                     return BadRequest("Item not found in the cart");
