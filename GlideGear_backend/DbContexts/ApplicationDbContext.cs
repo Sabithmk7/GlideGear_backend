@@ -1,4 +1,5 @@
 ﻿using GlideGear_backend.Models;
+using GlideGear_backend.Models.Order_Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace GlideGear_backend.DbContexts
@@ -17,6 +18,8 @@ namespace GlideGear_backend.DbContexts
         public DbSet<Category> Categories { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
 
 

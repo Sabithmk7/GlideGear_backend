@@ -70,6 +70,7 @@ namespace GlideGear_backend.Services.Users
             }
 
             var uToken=GenerateToken(u);
+
             return uToken;
         }
 

@@ -69,6 +69,7 @@ namespace GlideGear_backend
                 app.UseSwaggerUI();
             }
 
+            app.UseStaticFiles();
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
