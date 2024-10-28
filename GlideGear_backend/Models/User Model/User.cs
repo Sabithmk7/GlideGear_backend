@@ -1,4 +1,5 @@
 ﻿using GlideGear_backend.Models.Order_Model;
+using GlideGear_backend.Models.WhishList_Model;
 using System.ComponentModel.DataAnnotations;
 
 namespace GlideGear_backend.Models
@@ -18,8 +19,10 @@ namespace GlideGear_backend.Models
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
         public string? Password { get; set; }
 
+
         public string? Role {  get; set; }
         public virtual Cart? Cart { get; set; }
         public virtual List<OrderMain> Orders { get; set; }
+        public virtual List<WhishList> WhishLists { get; set; }
     }
 }

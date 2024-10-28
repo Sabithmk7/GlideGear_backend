@@ -1,5 +1,6 @@
 ﻿using GlideGear_backend.Models;
 using GlideGear_backend.Models.Order_Model;
+using GlideGear_backend.Models.WhishList_Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace GlideGear_backend.DbContexts
@@ -20,8 +21,7 @@ namespace GlideGear_backend.DbContexts
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<OrderMain> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
-
-
+        public DbSet<WhishList> WhishLists { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -78,6 +78,18 @@ namespace GlideGear_backend.DbContexts
             modelBuilder.Entity<OrderMain>()
                 .Property(s => s.OrderStatus)
                 .HasDefaultValue("Processing");
+
+
+            //WhishList
+
+            modelBuilder.Entity<WhishList>()
+                .HasOne(u=>u.Users)
+                .WithMany(w=>w.WhishLists)
+                .HasForeignKey(u=>u.UserId);
+            modelBuilder.Entity<WhishList>()
+                .HasOne(w=>w.Products)
+                .WithMany()
+                .HasForeignKey(w=>w.ProductId);
         }
     }
 }

@@ -9,6 +9,7 @@ using GlideGear_backend.Services.OrderSerices;
 using GlideGear_backend.Services.ProductServices;
 using GlideGear_backend.Services.Users;
 using GlideGear_backend.Services.UserServices;
+using GlideGear_backend.Services.WhishListServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -41,6 +42,7 @@ namespace GlideGear_backend
             builder.Services.AddScoped<IJwtServices, JwtServices>();
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IWhishListService, WhishListService>();
 
             //Jwt authentication
 
