@@ -27,13 +27,34 @@ namespace GlideGear_backend.Controllers
                     return BadRequest("Invalid user ID.");
                 }
 
-                var res = _whishListService.GetWhishList(userId);
+                var res =await _whishListService.GetWhishList(userId);
                 return Ok(res);
             }catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPost("AddOrRemove/{productId}")]
+        public async Task<IActionResult> AddOrRemove(int productId)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdString, out int userId))
+                {
+                    return BadRequest("Invalid user ID.");
+                }
+                string res=await _whishListService.AddOrRemove(userId,productId);
+                return Ok(res);
+                
+            }catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        
 
     }
 }

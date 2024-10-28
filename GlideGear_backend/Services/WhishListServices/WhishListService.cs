@@ -26,7 +26,7 @@ namespace GlideGear_backend.Services.WhishListServices
             _mapper=mapper;
         }
 
-        public async Task<bool> AddToWhishList(int userId, int productId)
+        public async Task<string> AddOrRemove(int userId, int productId)
         {
             var isExist = await _context.WhishLists.Include(p=>p.Products).FirstOrDefaultAsync(w=>w.ProductId == productId && w.UserId==userId);
             if (isExist == null)
@@ -39,30 +39,33 @@ namespace GlideGear_backend.Services.WhishListServices
 
                 var w = _mapper.Map<WhishList>(whishListDto);
                 _context.WhishLists.Add(w);
+                await _context.SaveChangesAsync();
+                return "Item added to wishlist";
             }
             else
             {
                 _context.WhishLists.Remove(isExist);
+                await _context.SaveChangesAsync();
+                return "Item removed from wishlist";
             }
-            await _context.SaveChangesAsync();
-            return true;
+            
         }
 
-        public async Task RemoveFromWhishList(int userId, int productId)
-        {
-            try
-            {
-                var w = await _context.WhishLists.FirstOrDefaultAsync(w => w.ProductId == productId && w.UserId == userId);
-                if (w != null)
-                {
-                    _context.WhishLists.Remove(w);
-                    await _context.SaveChangesAsync();
-                }
-            }catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
+        //public async Task RemoveFromWhishList(int userId, int productId)
+        //{
+        //    try
+        //    {
+        //        var w = await _context.WhishLists.FirstOrDefaultAsync(w => w.ProductId == productId && w.UserId == userId);
+        //        if (w != null)
+        //        {
+        //            _context.WhishLists.Remove(w);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //    }catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
 
         public async Task<List<WhishListViewDto>> GetWhishList(int userId)
         {

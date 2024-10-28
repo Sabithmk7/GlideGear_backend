@@ -49,7 +49,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [Authorize(Roles ="admin")]
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteCategory/{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             try
