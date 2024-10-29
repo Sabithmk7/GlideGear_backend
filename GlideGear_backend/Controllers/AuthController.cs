@@ -44,7 +44,7 @@ namespace GlideGear_backend.Controllers
                 };
 
                 Response.Cookies.Append("AuthToken", token, cookieOptions);
-                return Ok(new {Token=token});
+                return Ok("User loggined successfully");
             }catch(Exception ex)
             {
                 return Unauthorized(new { Message = "Login failed", Error = ex.Message }); ;

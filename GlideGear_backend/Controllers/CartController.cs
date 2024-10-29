@@ -22,8 +22,6 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                
-
                 var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (!int.TryParse(userIdString, out int userId))
                 {
@@ -62,7 +60,7 @@ namespace GlideGear_backend.Controllers
             }
         }
 
-        [HttpDelete("{productId}")]
+        [HttpDelete("Delete/{productId}")]
         public async Task<IActionResult> RemoveCart(int productId)
         {
             try

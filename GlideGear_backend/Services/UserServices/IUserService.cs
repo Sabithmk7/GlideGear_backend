@@ -5,5 +5,6 @@ namespace GlideGear_backend.Services.UserServices
     public interface IUserService
     {
         Task<List<UserViewDto>> GetUsers();
+        Task<string> BlockAndUnblock(int userId);
     }
 }

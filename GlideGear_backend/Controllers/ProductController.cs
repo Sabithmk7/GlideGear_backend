@@ -54,7 +54,7 @@ namespace GlideGear_backend.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             try
@@ -73,7 +73,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [Authorize(Roles ="admin")]
-        [HttpPost]
+        [HttpPost("Add")]
         public async Task<IActionResult> AddProduct([FromForm] ProductDto productDto, IFormFile image)
         {
 
@@ -92,7 +92,7 @@ namespace GlideGear_backend.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("UpdateProduct/{id}")]
         public async Task<IActionResult> UpdateProduct(int id,[FromForm]ProductDto productDto,IFormFile image)
         {
             try

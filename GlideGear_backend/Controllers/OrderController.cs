@@ -116,19 +116,23 @@ namespace GlideGear_backend.Controllers
 
         }
 
-        [HttpPut("update-order-status")]
-       
+        [HttpPut("update-order-status/{orderId}")]
         public async Task<ActionResult> UpdateOrderStatus(int orderId, [FromBody] UpdateOrderStatusDto updateOrder)
         {
             try
             {
-                var status = await _orderService.UpdateOrderStatus(orderId, updateOrder);
-                return Ok();
+                var statusUpdated = await _orderService.UpdateOrderStatus(orderId, updateOrder);
 
+                if (statusUpdated)
+                {
+                    return Ok(); 
+                }
+
+                return NotFound(); 
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, ex.Message); 
             }
         }
 

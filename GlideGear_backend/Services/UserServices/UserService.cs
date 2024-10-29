@@ -26,5 +26,25 @@ namespace GlideGear_backend.Services.UserServices
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<string> BlockAndUnblock(int userId)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+                user.isBlocked = !user.isBlocked;
+                await _context.SaveChangesAsync();
+
+                return user.isBlocked==true ? "User is blocked" : "User is unblocked";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

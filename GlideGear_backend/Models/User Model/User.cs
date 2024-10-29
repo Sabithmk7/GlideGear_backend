@@ -18,9 +18,8 @@ namespace GlideGear_backend.Models
         [Required(ErrorMessage = "Password is required.")]
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
         public string? Password { get; set; }
-
-
         public string? Role {  get; set; }
+        public bool? isBlocked { get; set; }
         public virtual Cart? Cart { get; set; }
         public virtual List<OrderMain> Orders { get; set; }
         public virtual List<WhishList> WhishLists { get; set; }

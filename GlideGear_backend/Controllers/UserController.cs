@@ -27,7 +27,20 @@ namespace GlideGear_backend.Controllers
             }
             catch (Exception ex)
             {
-                return Unauthorized(ex.Message);
+                return StatusCode(500,ex.Message);
+            }
+        }
+
+        [HttpPatch("blockorUnblock/{userId}")]
+        public async Task<IActionResult> BlockOrUnblockUser(int userId)
+        {
+            try
+            {
+                string res = await _userServices.BlockAndUnblock(userId);
+                return Ok(res);
+            }catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 

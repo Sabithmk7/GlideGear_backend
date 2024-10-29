@@ -90,6 +90,13 @@ namespace GlideGear_backend.DbContexts
                 .HasOne(w=>w.Products)
                 .WithMany()
                 .HasForeignKey(w=>w.ProductId);
+
+
+            //user
+
+            modelBuilder.Entity<User>()
+                .Property(i => i.isBlocked)
+                .HasDefaultValue(false);
         }
     }
 }
