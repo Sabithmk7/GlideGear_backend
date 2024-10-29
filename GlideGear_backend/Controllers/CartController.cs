@@ -22,11 +22,7 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(userIdString, out int userId))
-                {
-                    return BadRequest("Invalid user ID.");
-                }
+                int userId = GetUserIdFromClaims();
 
                 var res = await _cartService.GetCartItems(userId);
                 return Ok(res);
@@ -41,11 +37,7 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(userIdString, out int userId))
-                {
-                    return BadRequest("Invalid user ID.");
-                }
+                int userId = GetUserIdFromClaims();
 
                 bool res=await _cartService.AddToCart(userId, productId);
                 if (res == true)
@@ -65,11 +57,7 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(userIdString, out int userId))
-                {
-                    return BadRequest("Invalid user ID.");
-                }
+                int userId = GetUserIdFromClaims();
 
                 bool res = await _cartService.RemoveFromCart(userId, productId);
                 if (res == false)
@@ -88,12 +76,7 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(userIdString, out int userId))
-                {
-                    return BadRequest("Invalid user ID.");
-                }
-
+                int userId = GetUserIdFromClaims();
                 bool res=await _cartService.IncreaseQuantity(userId, productId);
                 if(res == false)
                 {
@@ -112,11 +95,7 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(userIdString, out int userId))
-                {
-                    return BadRequest("Invalid user ID.");
-                }
+                int userId = GetUserIdFromClaims();
 
                 bool res = await _cartService.DecreaseQuantity(userId, productId);
                 if (res == false)
@@ -129,6 +108,15 @@ namespace GlideGear_backend.Controllers
             {
                 return StatusCode(500, ex.Message);
             }
+        }
+        private int GetUserIdFromClaims()
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdString, out int userId))
+            {
+                return userId;
+            }
+            throw new Exception("Invalid user ID.");
         }
     }
 }

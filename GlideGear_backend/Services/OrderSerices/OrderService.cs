@@ -8,17 +8,15 @@ using Razorpay.Api;
 
 namespace GlideGear_backend.Services.OrderSerices
 {
-    public class OrderService:IOrderService
+    public class OrderService : IOrderService
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
-        private readonly IJwtServices _jwtServices;
         private readonly string HostUrl;
-        public OrderService(ApplicationDbContext context, IConfiguration configuration, IJwtServices jwtServices)
+        public OrderService(ApplicationDbContext context, IConfiguration configuration)
         {
             _configuration = configuration;
             _context = context;
-            _jwtServices = jwtServices;
             HostUrl = _configuration["Host:Url"];
         }
 
@@ -72,19 +70,15 @@ namespace GlideGear_backend.Services.OrderSerices
             catch (Exception ex)
             {
 
-                throw new Exception("Payment verification failed: " + ex.Message);
+                throw new Exception(ex.Message);
             }
         }
-        public async Task<bool> CreateOrder(string token, CreateOrderDto createOrderDto)
+        public async Task<bool> CreateOrder(int userId, CreateOrderDto createOrderDto)
         {
             try
             {
-                int userId = _jwtServices.GetUserIdFromToken(token);
-                if (userId == 0)
-                {
-                    throw new Exception("User not found");
-                }
-                if(createOrderDto.TransactionId==null && createOrderDto.OrderString == null)
+
+                if (createOrderDto.TransactionId == null && createOrderDto.OrderString == null)
                 {
                     return false;
                 }
@@ -111,24 +105,21 @@ namespace GlideGear_backend.Services.OrderSerices
                 _context.Carts.Remove(cart);
                 await _context.SaveChangesAsync();
                 return true;
-                
-            }catch (Exception ex)
+
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
 
-        public async Task<List<OrderViewDto>> GetOrderDetails(string token)
+        public async Task<List<OrderViewDto>> GetOrderDetails(int userId)
         {
-            var userId = _jwtServices.GetUserIdFromToken(token);
-            if (userId == 0)
-            {
-                throw new Exception("User is not valid");
-            }
 
-            var orders=await _context.Orders.Include(oi=>oi.OrderItems).ThenInclude(p=>p.Product).Where(u=>u.userId == userId).ToListAsync();
 
-            var OrderDetails=new List<OrderViewDto>();
+            var orders = await _context.Orders.Include(oi => oi.OrderItems).ThenInclude(p => p.Product).Where(u => u.userId == userId).ToListAsync();
+
+            var OrderDetails = new List<OrderViewDto>();
 
             foreach (var order in orders)
             {
@@ -155,11 +146,11 @@ namespace GlideGear_backend.Services.OrderSerices
         {
             var orders = await _context.Orders.Include(oi => oi.OrderItems).ToListAsync();
 
-            if(orders.Count != 0)
+            if (orders.Count != 0)
             {
-                var orderDetails = orders.Select(o => new OrderAdminViewDto 
+                var orderDetails = orders.Select(o => new OrderAdminViewDto
                 {
-                    Id=o.Id,
+                    Id = o.Id,
                     CustomerEmail = o.CustomerEmail,
                     CustomerName = o.CustomerName,
                     OrderId = o.OrderString,
@@ -176,9 +167,10 @@ namespace GlideGear_backend.Services.OrderSerices
         {
             try
             {
-                var total = await _context.OrderItems.SumAsync(itm=>itm.TotalPrice);
+                var total = await _context.OrderItems.SumAsync(itm => itm.TotalPrice);
                 return total;
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -187,9 +179,10 @@ namespace GlideGear_backend.Services.OrderSerices
         {
             try
             {
-                var totalP=await _context.OrderItems.SumAsync(i=>i.Quantity);
+                var totalP = await _context.OrderItems.SumAsync(i => i.Quantity);
                 return totalP;
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -197,7 +190,7 @@ namespace GlideGear_backend.Services.OrderSerices
 
         public async Task<bool> UpdateOrderStatus(int orderId, UpdateOrderStatusDto value)
         {
-            var order=await _context.Orders.FindAsync(orderId);
+            var order = await _context.Orders.FindAsync(orderId);
 
             if (order != null)
             {

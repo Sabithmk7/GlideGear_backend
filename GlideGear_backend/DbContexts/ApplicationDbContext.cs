@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GlideGear_backend.DbContexts
 {
-    public class ApplicationDbContext:DbContext
+    public class ApplicationDbContext : DbContext
     {
         private readonly string connectionString;
         public ApplicationDbContext(IConfiguration configuration)
@@ -15,7 +15,7 @@ namespace GlideGear_backend.DbContexts
 
         //DbSets
         public DbSet<User> Users { get; set; }
-        public DbSet<Product> Products { get; set; } 
+        public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
@@ -50,28 +50,28 @@ namespace GlideGear_backend.DbContexts
               .WithOne(c => c.User)
               .HasForeignKey<Cart>(c => c.UserId);
             modelBuilder.Entity<Cart>()
-                .HasMany(x=>x.CartItems)
-                .WithOne(c=>c.Cart)
-                .HasForeignKey(i=>i.CartId);
+                .HasMany(x => x.CartItems)
+                .WithOne(c => c.Cart)
+                .HasForeignKey(i => i.CartId);
             modelBuilder.Entity<CartItem>()
-                .HasOne(c=>c.Product)
+                .HasOne(c => c.Product)
                 .WithMany(i => i.CartItems)
-                .HasForeignKey(k=>k.ProductId);
-            
+                .HasForeignKey(k => k.ProductId);
+
             //order
 
             modelBuilder.Entity<OrderMain>()
-                .HasOne(u=>u.Users)
-                .WithMany(o=>o.Orders)
-                .HasForeignKey(f=>f.userId);
+                .HasOne(u => u.Users)
+                .WithMany(o => o.Orders)
+                .HasForeignKey(f => f.userId);
             modelBuilder.Entity<OrderItem>()
-                .HasOne(u=>u.Orders)
-                .WithMany(oi=>oi.OrderItems)
-                .HasForeignKey(f=>f.OrderId);
+                .HasOne(u => u.Orders)
+                .WithMany(oi => oi.OrderItems)
+                .HasForeignKey(f => f.OrderId);
             modelBuilder.Entity<OrderItem>()
-                .HasOne(p=>p.Product)
+                .HasOne(p => p.Product)
                 .WithMany()
-                .HasForeignKey(p=>p.ProductId);
+                .HasForeignKey(p => p.ProductId);
             modelBuilder.Entity<OrderItem>()
                 .Property(pr => pr.TotalPrice).
                 HasPrecision(30, 2);
@@ -83,13 +83,13 @@ namespace GlideGear_backend.DbContexts
             //WhishList
 
             modelBuilder.Entity<WhishList>()
-                .HasOne(u=>u.Users)
-                .WithMany(w=>w.WhishLists)
-                .HasForeignKey(u=>u.UserId);
+                .HasOne(u => u.Users)
+                .WithMany(w => w.WhishLists)
+                .HasForeignKey(u => u.UserId);
             modelBuilder.Entity<WhishList>()
-                .HasOne(w=>w.Products)
+                .HasOne(w => w.Products)
                 .WithMany()
-                .HasForeignKey(w=>w.ProductId);
+                .HasForeignKey(w => w.ProductId);
 
 
             //user

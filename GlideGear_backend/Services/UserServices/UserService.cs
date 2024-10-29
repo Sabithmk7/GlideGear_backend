@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GlideGear_backend.Services.UserServices
 {
-    public class UserService:IUserService
+    public class UserService : IUserService
     {
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
@@ -39,7 +39,7 @@ namespace GlideGear_backend.Services.UserServices
                 user.isBlocked = !user.isBlocked;
                 await _context.SaveChangesAsync();
 
-                return user.isBlocked==true ? "User is blocked" : "User is unblocked";
+                return user.isBlocked == true ? "User is blocked" : "User is unblocked";
             }
             catch (Exception ex)
             {

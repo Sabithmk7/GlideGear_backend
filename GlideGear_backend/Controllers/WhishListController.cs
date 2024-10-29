@@ -21,15 +21,12 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(userIdString, out int userId))
-                {
-                    return BadRequest("Invalid user ID.");
-                }
 
-                var res =await _whishListService.GetWhishList(userId);
+                int userId = GetUserIdFromClaims();
+                var res = await _whishListService.GetWhishList(userId);
                 return Ok(res);
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
@@ -40,21 +37,26 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(userIdString, out int userId))
-                {
-                    return BadRequest("Invalid user ID.");
-                }
-                string res=await _whishListService.AddOrRemove(userId,productId);
+                int userId = GetUserIdFromClaims();
+                string res = await _whishListService.AddOrRemove(userId, productId);
                 return Ok(res);
-                
-            }catch (Exception ex)
+
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        
+        private int GetUserIdFromClaims()
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdString, out int userId))
+            {
+                return userId;
+            }
+            throw new Exception("Invalid user ID.");
+        }
 
     }
 }

@@ -9,26 +9,26 @@ using System.Linq;
 
 namespace GlideGear_backend.Services.WhishListServices
 {
-    public class WhishListService:IWhishListService
+    public class WhishListService : IWhishListService
     {
         private readonly ApplicationDbContext _context;
-     
+
         private readonly IConfiguration _configuration;
         private readonly string HostUrl;
         private readonly IMapper _mapper;
-   
 
-        public WhishListService(ApplicationDbContext context, IConfiguration configuration,IMapper mapper)
+
+        public WhishListService(ApplicationDbContext context, IConfiguration configuration, IMapper mapper)
         {
-            _context=context;
+            _context = context;
             _configuration = configuration;
             HostUrl = _configuration["HostUrl:url"];
-            _mapper=mapper;
+            _mapper = mapper;
         }
 
         public async Task<string> AddOrRemove(int userId, int productId)
         {
-            var isExist = await _context.WhishLists.Include(p=>p.Products).FirstOrDefaultAsync(w=>w.ProductId == productId && w.UserId==userId);
+            var isExist = await _context.WhishLists.Include(p => p.Products).FirstOrDefaultAsync(w => w.ProductId == productId && w.UserId == userId);
             if (isExist == null)
             {
                 WhishListDto whishListDto = new WhishListDto()
@@ -48,7 +48,7 @@ namespace GlideGear_backend.Services.WhishListServices
                 await _context.SaveChangesAsync();
                 return "Item removed from wishlist";
             }
-            
+
         }
 
         //public async Task RemoveFromWhishList(int userId, int productId)
@@ -94,9 +94,10 @@ namespace GlideGear_backend.Services.WhishListServices
                 {
                     return new List<WhishListViewDto>();
                 }
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
-                throw new Exception(ex.Message); 
+                throw new Exception(ex.Message);
             }
         }
     }

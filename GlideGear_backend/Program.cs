@@ -29,17 +29,17 @@ namespace GlideGear_backend
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            
+
             builder.Services.AddDbContext<ApplicationDbContext>();
             builder.Services.AddAutoMapper(typeof(MapperProfile));
 
             //_______Service class registration_____
 
-            builder.Services.AddScoped<IAuthServices,AuthSevices>();
-            builder.Services.AddScoped<IUserService,UserService>();
-            builder.Services.AddScoped<ICategoryServices,CategoryServices>();
-            builder.Services.AddScoped<IProductServices,ProductService>();
-            builder.Services.AddScoped<IJwtServices, JwtServices>();
+            builder.Services.AddScoped<IAuthServices, AuthSevices>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+            builder.Services.AddScoped<IProductServices, ProductService>();
+            //builder.Services.AddScoped<IJwtServices, JwtServices>();
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IWhishListService, WhishListService>();
@@ -78,6 +78,7 @@ namespace GlideGear_backend
             app.UseMiddleware<JwtCookieMiddleware>();
             app.UseStaticFiles();
             app.UseHttpsRedirection();
+
 
             app.UseAuthentication();
             app.UseAuthorization();

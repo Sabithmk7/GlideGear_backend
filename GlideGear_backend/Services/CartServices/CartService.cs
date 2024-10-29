@@ -9,13 +9,11 @@ namespace GlideGear_backend.Services.CartServices
     public class CartService : ICartService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IJwtServices _jwtServices;
         private readonly string HostUrl;
         private readonly ILogger<CartService> _logger;
-        public CartService(ApplicationDbContext context, IJwtServices jwtServices, IConfiguration configuration, ILogger<CartService> logger)
+        public CartService(ApplicationDbContext context, IConfiguration configuration, ILogger<CartService> logger)
         {
             _context = context;
-            _jwtServices = jwtServices;
             HostUrl = configuration["HostUrl:url"];
             _logger = logger;
         }
@@ -24,7 +22,7 @@ namespace GlideGear_backend.Services.CartServices
         {
             try
             {
-                
+
                 if (userId == 0)
                 {
                     throw new Exception("User id is null");
@@ -99,7 +97,7 @@ namespace GlideGear_backend.Services.CartServices
         {
             try
             {
-                
+
                 var user = await _context.Users.Include(c => c.Cart)
                                     .ThenInclude(ci => ci.CartItems)
                                     .ThenInclude(p => p.Product)
@@ -130,7 +128,7 @@ namespace GlideGear_backend.Services.CartServices
         {
             try
             {
-              
+
                 var user = await _context.Users.Include(c => c.Cart)
                                     .ThenInclude(ci => ci.CartItems)
                                     .ThenInclude(p => p.Product)
@@ -160,7 +158,7 @@ namespace GlideGear_backend.Services.CartServices
         {
             try
             {
-                
+
                 var user = await _context.Users.Include(c => c.Cart)
                                     .ThenInclude(ci => ci.CartItems)
                                     .ThenInclude(p => p.Product)

@@ -1,4 +1,5 @@
-﻿using GlideGear_backend.Models.Order_Model.Dtos;
+﻿using GlideGear_backend.Models;
+using GlideGear_backend.Models.Order_Model.Dtos;
 
 namespace GlideGear_backend.Services.OrderSerices
 {
@@ -6,8 +7,8 @@ namespace GlideGear_backend.Services.OrderSerices
     {
         Task<string> RazorOrderCreate(long price);
         bool RazorPayment(PaymentDto payment);
-        Task<bool> CreateOrder(string token,CreateOrderDto createOrderDto);
-        Task<List<OrderViewDto>> GetOrderDetails(string token);
+        Task<bool> CreateOrder(int userId, CreateOrderDto createOrderDto);
+        Task<List<OrderViewDto>> GetOrderDetails(int userId);
         Task<List<OrderAdminViewDto>> GetOrderDetailsAdmin();
         Task<decimal> TotalRevenue();
         Task<int> TotalProductsPurchased();

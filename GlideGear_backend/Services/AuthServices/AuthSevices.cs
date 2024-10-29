@@ -10,19 +10,19 @@ using System.Text;
 
 namespace GlideGear_backend.Services.Users
 {
-    public class AuthSevices:IAuthServices
+    public class AuthSevices : IAuthServices
     {
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
-        public AuthSevices(ApplicationDbContext context,IMapper mapper, IConfiguration configuration)
+        public AuthSevices(ApplicationDbContext context, IMapper mapper, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
             _configuration = configuration;
         }
 
-        
+
         public async Task<string> Register(UserRegistrationDto newUser)
         {
             try
@@ -54,12 +54,12 @@ namespace GlideGear_backend.Services.Users
         public async Task<String> Login(LoginDto user)
         {
             var u = await _context.Users.SingleOrDefaultAsync(x => x.Email == user.Email);
-            if(u == null || !ValidatePassword(user.Password,u.Password))
+            if (u == null || !ValidatePassword(user.Password, u.Password))
             {
                 throw new InvalidOperationException("Invalid email or password");
             }
 
-            var uToken=GenerateToken(u);
+            var uToken = GenerateToken(u);
 
             return uToken;
         }
@@ -82,9 +82,9 @@ namespace GlideGear_backend.Services.Users
             };
 
             var token = new JwtSecurityToken(
-                claims:claim,
+                claims: claim,
                 signingCredentials: credentails,
-                expires:DateTime.UtcNow.AddHours(2)
+                expires: DateTime.UtcNow.AddHours(2)
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -92,7 +92,7 @@ namespace GlideGear_backend.Services.Users
 
 
         //Bcrypt password verification
-        private bool ValidatePassword(string password,string hashPassword)
+        private bool ValidatePassword(string password, string hashPassword)
         {
             return BCrypt.Net.BCrypt.Verify(password, hashPassword);
         }

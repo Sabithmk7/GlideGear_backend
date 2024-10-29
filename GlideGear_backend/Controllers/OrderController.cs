@@ -59,15 +59,9 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                
-                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-                var splitToken = token.Split(' ');
-                var jwtToken = splitToken[1];
-                if (orderCreate == null || jwtToken == null)
-                {
-                    return BadRequest();
-                }
-                var status = await _orderService.CreateOrder(jwtToken, orderCreate);
+
+                int userId = GetUserIdFromClaims();
+                var status = await _orderService.CreateOrder(userId, orderCreate);
                 return Ok(status);
             }
             catch (Exception e)
@@ -83,14 +77,8 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-                var splitToken = token.Split(' ');
-                var jwtToken = splitToken[1];
-                if (jwtToken == null)
-                {
-                    return BadRequest();
-                }
-                return Ok(await _orderService.GetOrderDetails(jwtToken));
+                int userId = GetUserIdFromClaims();
+                return Ok(await _orderService.GetOrderDetails(userId));
 
             }
             catch (Exception e)
@@ -161,6 +149,15 @@ namespace GlideGear_backend.Controllers
             {
                 return StatusCode(500, e.Message);
             }
+        }
+        private int GetUserIdFromClaims()
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdString, out int userId))
+            {
+                return userId;
+            }
+            throw new Exception("Invalid user ID.");
         }
 
     }

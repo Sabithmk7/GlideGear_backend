@@ -7,13 +7,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GlideGear_backend.Services.ProductServices
 {
-    public class ProductService:IProductServices
+    public class ProductService : IProductServices
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly string HostUrl;
-        public ProductService(ApplicationDbContext context,IMapper mapper,IWebHostEnvironment webHostEnvironment,IConfiguration configuration)
+        public ProductService(ApplicationDbContext context, IMapper mapper, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
@@ -42,7 +42,8 @@ namespace GlideGear_backend.Services.ProductServices
 
                 }
                 return new List<ProductViewDto>();
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -69,7 +70,8 @@ namespace GlideGear_backend.Services.ProductServices
                     };
                     return p;
                 }
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -78,7 +80,7 @@ namespace GlideGear_backend.Services.ProductServices
         {
             try
             {
-                var products = await _context.Products.Include(p => p.Category).Where(p => p.Category.Name == categoryName).Select(p => new ProductViewDto 
+                var products = await _context.Products.Include(p => p.Category).Where(p => p.Category.Name == categoryName).Select(p => new ProductViewDto
                 {
                     Id = p.ProductId,
                     Title = p.Title,
@@ -89,7 +91,8 @@ namespace GlideGear_backend.Services.ProductServices
                 }).ToListAsync();
 
                 return products;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -106,11 +109,12 @@ namespace GlideGear_backend.Services.ProductServices
                     return true;
                 }
                 return false;
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
-            
+
         }
         public async Task UpdateProduct(int id, ProductDto productDto, IFormFile image)
         {
@@ -129,7 +133,7 @@ namespace GlideGear_backend.Services.ProductServices
                     p.Price = productDto.Price;
                     p.CategoryId = productDto.CategoryId;
 
-                    if(image !=null && image.Length > 0)
+                    if (image != null && image.Length > 0)
                     {
                         string fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
                         string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Uploads", "Product", fileName);
@@ -139,7 +143,7 @@ namespace GlideGear_backend.Services.ProductServices
                             await image.CopyToAsync(stream);
                         }
 
-                        p.Img= "/Uploads/Product/" + fileName;
+                        p.Img = "/Uploads/Product/" + fileName;
                     }
                     await _context.SaveChangesAsync();
                 }
@@ -147,13 +151,15 @@ namespace GlideGear_backend.Services.ProductServices
                 {
                     throw new Exception($"Product with ID: {id} not found!");
                 }
-            }catch(Exception ex){
+            }
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message);
             }
         }
         public async Task AddProduct(ProductDto product, IFormFile image)
         {
-           
+
             try
             {
                 string? imageUrl = null;
@@ -174,7 +180,8 @@ namespace GlideGear_backend.Services.ProductServices
 
                 await _context.Products.AddAsync(prd);
                 await _context.SaveChangesAsync();
-            }catch(DbUpdateException ex)
+            }
+            catch (DbUpdateException ex)
             {
                 throw new Exception(ex.InnerException?.Message ?? ex.Message);
             }
@@ -185,22 +192,22 @@ namespace GlideGear_backend.Services.ProductServices
         }
         public async Task<List<ProductViewDto>> SearchProduct(string search)
         {
-            var products = await _context.Products.Include(x=>x.Category).Where(p => p.Title.ToLower().Contains(search.ToLower())).ToListAsync();
+            var products = await _context.Products.Include(x => x.Category).Where(p => p.Title.ToLower().Contains(search.ToLower())).ToListAsync();
             if (products != null)
             {
                 return products.Select(s => new ProductViewDto
                 {
-                    Id=s.ProductId,
-                    Title=s.Title,
-                    Description=s.Description,
-                    Price=s.Price,
-                    ProductImage=HostUrl+s.Img,
-                    Category=s.Category.Name
+                    Id = s.ProductId,
+                    Title = s.Title,
+                    Description = s.Description,
+                    Price = s.Price,
+                    ProductImage = HostUrl + s.Img,
+                    Category = s.Category.Name
                 }).ToList();
             }
             return new List<ProductViewDto>();
         }
-        public async Task<List<ProductViewDto>> ProductPagination(int pagenumber=1,int size = 10)
+        public async Task<List<ProductViewDto>> ProductPagination(int pagenumber = 1, int size = 10)
         {
             try
             {
@@ -220,7 +227,8 @@ namespace GlideGear_backend.Services.ProductServices
                     Category = p.Category.Name
                 }).ToList();
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }

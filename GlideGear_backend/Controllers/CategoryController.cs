@@ -24,8 +24,8 @@ namespace GlideGear_backend.Controllers
                 var categoryList =await _services.getCategories();
                 return Ok(categoryList);
             }catch (Exception ex) 
-            { 
-                return BadRequest(ex.Message);
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -40,11 +40,11 @@ namespace GlideGear_backend.Controllers
                 {
                     return Ok("Category successfully added");
                 }
-                return BadRequest("The category already exist");
+                return Conflict("The category already exist");
 
             }catch(Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -59,10 +59,10 @@ namespace GlideGear_backend.Controllers
                 {
                     return Ok("Category deleted succedully");
                 }
-                return BadRequest("Category Not found");
+                return NotFound("Category Not found");
             }catch(Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
