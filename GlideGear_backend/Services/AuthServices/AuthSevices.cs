@@ -58,6 +58,10 @@ namespace GlideGear_backend.Services.Users
             {
                 throw new InvalidOperationException("Invalid email or password");
             }
+            if (u.isBlocked == true)
+            {
+                throw new Exception("You are blocked");
+            }
 
             var uToken = GenerateToken(u);
 

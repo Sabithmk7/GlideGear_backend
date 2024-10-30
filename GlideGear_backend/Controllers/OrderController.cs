@@ -18,6 +18,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpPost("Order-create")]
+        [Authorize]
         public async Task<ActionResult> createOrder(long price)
         {
             try
@@ -36,6 +37,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpPost("payment")]
+        [Authorize]
         public ActionResult Payment(PaymentDto razorpay)
         {
             try
@@ -55,6 +57,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpPost("place-order")]
+        [Authorize]
         public async Task<ActionResult> PlaceOrder(CreateOrderDto orderCreate)
         {
             try
@@ -72,7 +75,8 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpGet("getOrderDetails")]
-        
+        [Authorize]
+
         public async Task<ActionResult> GetOrderDetails()
         {
             try
@@ -89,7 +93,8 @@ namespace GlideGear_backend.Controllers
 
         }
         [HttpGet("get-order-details-admin")]
-        
+        [Authorize(Roles ="admin")]
+
         public async Task<ActionResult> GetOrderDetailsAdmin()
         {
             try
@@ -105,6 +110,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpPut("update-order-status/{orderId}")]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult> UpdateOrderStatus(int orderId, [FromBody] UpdateOrderStatusDto updateOrder)
         {
             try
@@ -125,7 +131,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpGet("totalProductsPurchased")]
-
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult> TotalProducts()
         {
             try
@@ -138,7 +144,7 @@ namespace GlideGear_backend.Controllers
             }
         }
         [HttpGet("totalRevenue")]
-
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult> TotalRevenue()
         {
             try

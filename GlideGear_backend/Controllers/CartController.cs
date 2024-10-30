@@ -16,6 +16,7 @@ namespace GlideGear_backend.Controllers
         {
             _cartService = cartService;
         }
+
         [HttpGet("all")]
         [Authorize]
         public async Task<IActionResult> GetItems()
@@ -33,6 +34,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpPost("add/{productId}")]
+        [Authorize]
         public async Task<IActionResult> Addtocart(int productId)
         {
             try
@@ -53,6 +55,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpDelete("Delete/{productId}")]
+        [Authorize]
         public async Task<IActionResult> RemoveCart(int productId)
         {
             try
@@ -72,6 +75,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpPut("IncreaseQty/{productId}")]
+        [Authorize]
         public async Task<IActionResult> IncreaseQty(int productId)
         {
             try
@@ -91,6 +95,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpPut("DecreaseQty/{productId}")]
+        [Authorize]
         public async Task<IActionResult> DecreaseQty(int productId)
         {
             try

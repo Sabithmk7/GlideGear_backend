@@ -55,6 +55,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpDelete("Delete/{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             try
@@ -93,6 +94,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpPut("UpdateProduct/{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateProduct(int id,[FromForm]ProductDto productDto,IFormFile image)
         {
             try

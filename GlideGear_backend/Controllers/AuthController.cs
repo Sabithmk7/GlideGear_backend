@@ -11,10 +11,10 @@ namespace GlideGear_backend.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthServices _userServices;
-        public AuthController(IAuthServices userServices)
+        private readonly IAuthServices _authServices;
+        public AuthController(IAuthServices authServices)
         {
-            _userServices = userServices;
+            _authServices = authServices;
         }
         
         [HttpPost("Register")]
@@ -22,7 +22,7 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                string isDone = await _userServices.Register(newUser);
+                string isDone = await _authServices.Register(newUser);
                 return Ok(isDone);
             }catch(Exception ex)
             {
@@ -34,7 +34,7 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                var token =await _userServices.Login(login);
+                var token =await _authServices.Login(login);
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true, 

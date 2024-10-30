@@ -1,4 +1,5 @@
 ﻿using GlideGear_backend.Services.WhishListServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -16,7 +17,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpGet("GetWhishList")]
-
+        [Authorize]
         public async Task<IActionResult> GetWhishLists()
         {
             try
@@ -33,6 +34,7 @@ namespace GlideGear_backend.Controllers
         }
 
         [HttpPost("AddOrRemove/{productId}")]
+        [Authorize]
         public async Task<IActionResult> AddOrRemove(int productId)
         {
             try
