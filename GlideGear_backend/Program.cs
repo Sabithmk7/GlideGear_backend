@@ -4,6 +4,7 @@ using GlideGear_backend.Mapper;
 using GlideGear_backend.Middleware;
 using GlideGear_backend.Services.CartServices;
 using GlideGear_backend.Services.CategoryServices;
+using GlideGear_backend.Services.CloudinaryServices;
 using GlideGear_backend.Services.JwtService;
 using GlideGear_backend.Services.OrderSerices;
 using GlideGear_backend.Services.ProductServices;
@@ -43,6 +44,7 @@ namespace GlideGear_backend
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IWhishListService, WhishListService>();
+            builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
             //Jwt authentication
 

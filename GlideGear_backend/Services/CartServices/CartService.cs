@@ -9,12 +9,11 @@ namespace GlideGear_backend.Services.CartServices
     public class CartService : ICartService
     {
         private readonly ApplicationDbContext _context;
-        private readonly string HostUrl;
         private readonly ILogger<CartService> _logger;
-        public CartService(ApplicationDbContext context, IConfiguration configuration, ILogger<CartService> logger)
+
+        public CartService(ApplicationDbContext context, ILogger<CartService> logger)
         {
             _context = context;
-            HostUrl = configuration["HostUrl:url"];
             _logger = logger;
         }
 
@@ -22,14 +21,14 @@ namespace GlideGear_backend.Services.CartServices
         {
             try
             {
-
                 if (userId == 0)
                 {
                     throw new Exception("User id is null");
                 }
-                var user = await _context.Carts.Include(ci => ci.CartItems).ThenInclude(p => p.Product).FirstOrDefaultAsync(x => x.UserId == userId);
-                _logger.LogInformation($"{user}");
 
+                var user = await _context.Carts.Include(ci => ci.CartItems).ThenInclude(p => p.Product)
+                    .FirstOrDefaultAsync(x => x.UserId == userId);
+                _logger.LogInformation($"{user}");
 
                 if (user != null)
                 {
@@ -40,7 +39,7 @@ namespace GlideGear_backend.Services.CartServices
                         Quantity = c.Quantity,
                         Price = c.Product.Price,
                         TotalAmount = c.Product.Price * c.Quantity,
-                        ProductImage = HostUrl + c.Product.Img
+                        ProductImage = c.Product.Img // Removed HostUrl concatenation
                     }).ToList();
                 }
                 return new List<CartViewDto>();
@@ -62,7 +61,7 @@ namespace GlideGear_backend.Services.CartServices
 
                 if (user == null)
                 {
-                    throw new Exception("User  not found");
+                    throw new Exception("User not found");
                 }
                 if (user.Cart == null)
                 {
@@ -76,13 +75,14 @@ namespace GlideGear_backend.Services.CartServices
                 {
                     return false;
                 }
+
                 var item = new CartItem
                 {
                     CartId = user.Cart.Id,
                     ProductId = productId,
                     Quantity = 1,
-
                 };
+
                 user?.Cart?.CartItems?.Add(item);
                 await _context.SaveChangesAsync();
                 return true;
@@ -97,7 +97,6 @@ namespace GlideGear_backend.Services.CartServices
         {
             try
             {
-
                 var user = await _context.Users.Include(c => c.Cart)
                                     .ThenInclude(ci => ci.CartItems)
                                     .ThenInclude(p => p.Product)
@@ -107,6 +106,7 @@ namespace GlideGear_backend.Services.CartServices
                 {
                     throw new Exception("User is not found");
                 }
+
                 var deleteItem = user.Cart.CartItems.FirstOrDefault(p => p.ProductId == productId);
                 if (deleteItem == null)
                 {
@@ -121,14 +121,12 @@ namespace GlideGear_backend.Services.CartServices
             {
                 throw new Exception(ex.Message);
             }
-
         }
 
         public async Task<bool> IncreaseQuantity(int userId, int productId)
         {
             try
             {
-
                 var user = await _context.Users.Include(c => c.Cart)
                                     .ThenInclude(ci => ci.CartItems)
                                     .ThenInclude(p => p.Product)
@@ -158,7 +156,6 @@ namespace GlideGear_backend.Services.CartServices
         {
             try
             {
-
                 var user = await _context.Users.Include(c => c.Cart)
                                     .ThenInclude(ci => ci.CartItems)
                                     .ThenInclude(p => p.Product)

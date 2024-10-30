@@ -1,8 +1,6 @@
 ﻿using GlideGear_backend.DbContexts;
 using GlideGear_backend.Models.Order_Model;
 using GlideGear_backend.Models.Order_Model.Dtos;
-using GlideGear_backend.Services.JwtService;
-using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Razorpay.Api;
 
@@ -12,12 +10,11 @@ namespace GlideGear_backend.Services.OrderSerices
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
-        private readonly string HostUrl;
+
         public OrderService(ApplicationDbContext context, IConfiguration configuration)
         {
             _configuration = configuration;
             _context = context;
-            HostUrl = _configuration["Host:Url"];
         }
 
         public async Task<string> RazorOrderCreate(long price)
@@ -37,7 +34,6 @@ namespace GlideGear_backend.Services.OrderSerices
             var OrderId = order["id"].ToString();
 
             return OrderId;
-
         }
 
         public bool RazorPayment(PaymentDto payment)
@@ -69,15 +65,14 @@ namespace GlideGear_backend.Services.OrderSerices
             }
             catch (Exception ex)
             {
-
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task<bool> CreateOrder(int userId, CreateOrderDto createOrderDto)
         {
             try
             {
-
                 if (createOrderDto.TransactionId == null && createOrderDto.OrderString == null)
                 {
                     return false;
@@ -105,7 +100,6 @@ namespace GlideGear_backend.Services.OrderSerices
                 _context.Carts.Remove(cart);
                 await _context.SaveChangesAsync();
                 return true;
-
             }
             catch (Exception ex)
             {
@@ -115,8 +109,6 @@ namespace GlideGear_backend.Services.OrderSerices
 
         public async Task<List<OrderViewDto>> GetOrderDetails(int userId)
         {
-
-
             var orders = await _context.Orders.Include(oi => oi.OrderItems).ThenInclude(p => p.Product).Where(u => u.userId == userId).ToListAsync();
 
             var OrderDetails = new List<OrderViewDto>();
@@ -130,7 +122,7 @@ namespace GlideGear_backend.Services.OrderSerices
                         Id = item.ProductId,
                         OrderDate = order.OrderDate,
                         ProductName = item.Product.Title,
-                        ProductImage = HostUrl + item.Product.Img,
+                        ProductImage = item.Product.Img, // Use image URL directly
                         Quantity = item.Quantity,
                         TotalPrice = item.TotalPrice,
                         OrderId = order.OrderString,
@@ -175,6 +167,7 @@ namespace GlideGear_backend.Services.OrderSerices
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task<int> TotalProductsPurchased()
         {
             try

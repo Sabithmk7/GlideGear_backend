@@ -2,9 +2,7 @@
 using GlideGear_backend.DbContexts;
 using GlideGear_backend.Models.WhishList_Model;
 using GlideGear_backend.Models.WhishList_Model.Dto;
-using GlideGear_backend.Services.JwtService;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using System.Linq;
 
 namespace GlideGear_backend.Services.WhishListServices
@@ -12,17 +10,11 @@ namespace GlideGear_backend.Services.WhishListServices
     public class WhishListService : IWhishListService
     {
         private readonly ApplicationDbContext _context;
-
-        private readonly IConfiguration _configuration;
-        private readonly string HostUrl;
         private readonly IMapper _mapper;
 
-
-        public WhishListService(ApplicationDbContext context, IConfiguration configuration, IMapper mapper)
+        public WhishListService(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
-            _configuration = configuration;
-            HostUrl = _configuration["HostUrl:url"];
             _mapper = mapper;
         }
 
@@ -48,32 +40,15 @@ namespace GlideGear_backend.Services.WhishListServices
                 await _context.SaveChangesAsync();
                 return "Item removed from wishlist";
             }
-
         }
-
-        //public async Task RemoveFromWhishList(int userId, int productId)
-        //{
-        //    try
-        //    {
-        //        var w = await _context.WhishLists.FirstOrDefaultAsync(w => w.ProductId == productId && w.UserId == userId);
-        //        if (w != null)
-        //        {
-        //            _context.WhishLists.Remove(w);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //    }catch (Exception ex)
-        //    {
-        //        throw new Exception(ex.Message);
-        //    }
-        //}
 
         public async Task<List<WhishListViewDto>> GetWhishList(int userId)
         {
             try
             {
                 var items = await _context.WhishLists.Include(p => p.Products)
-                .ThenInclude(c => c.Category)
-                .Where(c => c.UserId == userId).ToListAsync();
+                    .ThenInclude(c => c.Category)
+                    .Where(c => c.UserId == userId).ToListAsync();
 
                 if (items != null)
                 {
@@ -83,9 +58,8 @@ namespace GlideGear_backend.Services.WhishListServices
                         ProductName = w.Products.Title,
                         ProductDescription = w.Products.Description,
                         Price = w.Products.Price,
-                        ProductImage = HostUrl + w.Products.Img,
+                        ProductImage = w.Products.Img, 
                         CategoryName = w.Products.Category.Name
-
                     }).ToList();
 
                     return p;
