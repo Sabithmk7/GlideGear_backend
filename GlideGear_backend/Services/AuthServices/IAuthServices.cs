@@ -1,11 +1,12 @@
 ﻿using GlideGear_backend.Models;
 using GlideGear_backend.Models.Dtos.UserDtos;
+using GlideGear_backend.Models.User_Model.UserDtos;
 
 namespace GlideGear_backend.Services.Users
 {
     public interface IAuthServices
     {
-        Task<string> Register(UserRegistrationDto userRegistrationDto);
-        Task<string> Login(LoginDto user);
+        Task<bool> Register(UserRegistrationDto userRegistrationDto);
+        Task<UserResponseDto> Login(LoginDto user);
     }
 }

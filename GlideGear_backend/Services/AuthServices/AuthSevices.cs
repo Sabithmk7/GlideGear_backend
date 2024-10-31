@@ -2,6 +2,7 @@
 using GlideGear_backend.DbContexts;
 using GlideGear_backend.Models;
 using GlideGear_backend.Models.Dtos.UserDtos;
+using GlideGear_backend.Models.User_Model.UserDtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -23,14 +24,14 @@ namespace GlideGear_backend.Services.Users
         }
 
 
-        public async Task<string> Register(UserRegistrationDto newUser)
+        public async Task<bool> Register(UserRegistrationDto newUser)
         {
             try
             {
                 var isUserExist = await _context.Users.SingleOrDefaultAsync(x => x.Email == newUser.Email);
                 if (isUserExist != null)
                 {
-                    return "User already exists";
+                    return false;
                 }
 
                 var hashPassword = BCrypt.Net.BCrypt.HashPassword(newUser.Password);
@@ -39,7 +40,7 @@ namespace GlideGear_backend.Services.Users
                 var u = _mapper.Map<User>(newUser);
                 _context.Users.Add(u);
                 await _context.SaveChangesAsync();
-                return "Registered Succesfully";
+                return true;
             }
             catch (DbUpdateException dbEx)
             {
@@ -51,21 +52,35 @@ namespace GlideGear_backend.Services.Users
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<String> Login(LoginDto user)
+        public async Task<UserResponseDto> Login(LoginDto user)
         {
-            var u = await _context.Users.SingleOrDefaultAsync(x => x.Email == user.Email);
-            if (u == null || !ValidatePassword(user.Password, u.Password))
+            try
             {
-                throw new InvalidOperationException("Invalid email or password");
+                var u = await _context.Users.SingleOrDefaultAsync(x => x.Email == user.Email);
+                if (u != null)
+                {
+                    var pass = ValidatePassword(user.Password, u.Password);
+                    if (pass)
+                    {
+                        if (u.isBlocked == true)
+                        {
+                            return new UserResponseDto { Error = "User Blocked" };
+                        }
+                        var uToken = GenerateToken(u);
+                        return new UserResponseDto { Token = uToken, Role = u.Role, Email = u.Email ,Id=u.Id,Name=u.UserName};
+
+                    }
+                    return new UserResponseDto { Error = "Invalid password" };
+                }
+                return new UserResponseDto { Error = "Not Found" };
+
             }
-            if (u.isBlocked == true)
+            catch (Exception ex)
             {
-                throw new Exception("You are blocked");
+                throw new Exception(ex.Message);
             }
 
-            var uToken = GenerateToken(u);
 
-            return uToken;
         }
 
 

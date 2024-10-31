@@ -66,6 +66,15 @@ namespace GlideGear_backend
                 };
             });
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("ReactPolicy", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
 
             var app = builder.Build();
 
@@ -77,6 +86,7 @@ namespace GlideGear_backend
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseCors("ReactPolicy");
             app.UseMiddleware<JwtCookieMiddleware>();
             app.UseStaticFiles();
             app.UseHttpsRedirection();

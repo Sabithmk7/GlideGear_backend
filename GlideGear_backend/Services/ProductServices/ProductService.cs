@@ -12,14 +12,12 @@ namespace GlideGear_backend.Services.ProductServices
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ICloudinaryService _cloudinaryService;
 
-        public ProductService(ApplicationDbContext context, IMapper mapper, IWebHostEnvironment webHostEnvironment, ICloudinaryService cloudinaryService)
+        public ProductService(ApplicationDbContext context, IMapper mapper,  ICloudinaryService cloudinaryService)
         {
             _context = context;
             _mapper = mapper;
-            _webHostEnvironment = webHostEnvironment;
             _cloudinaryService = cloudinaryService;
         }
 
@@ -36,12 +34,32 @@ namespace GlideGear_backend.Services.ProductServices
                         Title = p.Title,
                         Description = p.Description,
                         Price = p.Price,
-                        ProductImage = p.Img, // Directly use the Cloudinary image URL
+                        ProductImage = p.Img, 
                         Category = p.Category.Name
                     }).ToList();
                     return productWithCategory;
                 }
                 return new List<ProductViewDto>();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task AddProduct(ProductDto product, IFormFile image)
+        {
+            try
+            {
+                string imageUrl = await _cloudinaryService.UploadImageAsync(image);
+                var prd = _mapper.Map<Product>(product);
+                prd.Img = imageUrl;
+
+                await _context.Products.AddAsync(prd);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception(ex.InnerException?.Message ?? ex.Message);
             }
             catch (Exception ex)
             {
@@ -152,26 +170,7 @@ namespace GlideGear_backend.Services.ProductServices
             }
         }
 
-        public async Task AddProduct(ProductDto product, IFormFile image)
-        {
-            try
-            {
-                string imageUrl = await _cloudinaryService.UploadImageAsync(image);
-                var prd = _mapper.Map<Product>(product);
-                prd.Img = imageUrl;
-
-                await _context.Products.AddAsync(prd);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                throw new Exception(ex.InnerException?.Message ?? ex.Message);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
+        
 
         public async Task<List<ProductViewDto>> SearchProduct(string search)
         {
