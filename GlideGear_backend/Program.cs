@@ -81,14 +81,14 @@ namespace GlideGear_backend
             // Configure the HTTP request pipeline.
 
 
-            if (app.Environment.IsDevelopment())
+            if (app.Environment.IsDevelopment())    
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
             app.UseCors("ReactPolicy");
             app.UseMiddleware<JwtCookieMiddleware>();
-            app.UseStaticFiles();
+            app.UseStaticFiles();   
             app.UseHttpsRedirection();
 
 

@@ -73,12 +73,13 @@ namespace GlideGear_backend.Services.OrderSerices
         {
             try
             {
-                if (createOrderDto.TransactionId == null && createOrderDto.OrderString == null)
-                {
-                    return false;
-                }
+                //if (createOrderDto.TransactionId == null && createOrderDto.OrderString == null)
+                //{
+                //    return false;
+                //}
 
                 var cart = await _context.Carts.Include(c => c.CartItems).ThenInclude(p => p.Product).FirstOrDefaultAsync(u => u.UserId == userId);
+                //decimal sum = cart.CartItems.Sum(s => s.Product.Price * s.Quantity);
                 var order = new OrderMain
                 {
                     userId = userId,
@@ -88,7 +89,12 @@ namespace GlideGear_backend.Services.OrderSerices
                     CustomerCity = createOrderDto.CustomerCity,
                     CustomerPhone = createOrderDto.CustomerPhone,
                     HomeAddress = createOrderDto.HomeAddress,
-                    OrderString = createOrderDto.OrderString,
+                    Total=createOrderDto.Total,
+                    OrderString=createOrderDto.OrderString,
+                    TransactionId=createOrderDto.TransactionId,
+
+
+                    //OrderString = createOrderDto.OrderString,
                     OrderItems = cart.CartItems.Select(ci => new OrderItem
                     {
                         ProductId = ci.ProductId,
@@ -100,6 +106,18 @@ namespace GlideGear_backend.Services.OrderSerices
                 _context.Carts.Remove(cart);
                 await _context.SaveChangesAsync();
                 return true;
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the entire exception stack
+                //Console.WriteLine(ex);
+                //if (ex.InnerException != null)
+                //{
+                //    Console.WriteLine("Inner exception:");
+                //    Console.WriteLine(ex.InnerException.Message);
+                //}
+                throw new Exception(ex.InnerException?.Message);
+                //throw; // Optional: re-throw or handle as needed
             }
             catch (Exception ex)
             {
@@ -126,7 +144,7 @@ namespace GlideGear_backend.Services.OrderSerices
                         Quantity = item.Quantity,
                         TotalPrice = item.TotalPrice,
                         OrderId = order.OrderString,
-                        OrderStatus = order.OrderStatus,
+                        //OrderStatus = order.OrderStatus,
                     };
                     OrderDetails.Add(OrderDetail);
                 }
@@ -148,7 +166,7 @@ namespace GlideGear_backend.Services.OrderSerices
                     OrderId = o.OrderString,
                     TransactionId = o.TransactionId,
                     OrderDate = o.OrderDate,
-                    OrderStatus = o.OrderStatus
+                    //OrderStatus = o.OrderStatus
                 }).ToList();
                 return orderDetails;
             }
@@ -181,17 +199,17 @@ namespace GlideGear_backend.Services.OrderSerices
             }
         }
 
-        public async Task<bool> UpdateOrderStatus(int orderId, UpdateOrderStatusDto value)
-        {
-            var order = await _context.Orders.FindAsync(orderId);
+        //public async Task<bool> UpdateOrderStatus(int orderId, UpdateOrderStatusDto value)
+        //{
+        //    var order = await _context.Orders.FindAsync(orderId);
 
-            if (order != null)
-            {
-                order.OrderStatus = value.OrderStatus;
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            return false;
-        }
+        //    if (order != null)
+        //    {
+        //        order.OrderStatus = value.OrderStatus;
+        //        await _context.SaveChangesAsync();
+        //        return true;
+        //    }
+        //    return false;
+        //}
     }
 }

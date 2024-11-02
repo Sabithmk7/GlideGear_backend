@@ -75,9 +75,9 @@ namespace GlideGear_backend.DbContexts
             modelBuilder.Entity<OrderItem>()
                 .Property(pr => pr.TotalPrice).
                 HasPrecision(30, 2);
-            modelBuilder.Entity<OrderMain>()
-                .Property(s => s.OrderStatus)
-                .HasDefaultValue("Processing");
+            //modelBuilder.Entity<OrderMain>()
+            //    .Property(s => s.OrderStatus)
+            //    .HasDefaultValue("Processing");
 
 
             //WhishList

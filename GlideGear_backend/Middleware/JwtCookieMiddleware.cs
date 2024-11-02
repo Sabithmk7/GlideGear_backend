@@ -15,6 +15,7 @@
                 if (!context.Request.Headers.ContainsKey("Authorization"))
                 {
                     context.Request.Headers.Append("Authorization", $"Bearer {token}");
+                    Console.WriteLine($"{token}");
                 }
             }
             await _next(context);

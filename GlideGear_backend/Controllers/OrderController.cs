@@ -3,6 +3,7 @@ using GlideGear_backend.Services.OrderSerices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace GlideGear_backend.Controllers
@@ -29,6 +30,18 @@ namespace GlideGear_backend.Controllers
                 }
                 var orderId = await _orderService.RazorOrderCreate(price);
                 return Ok(orderId);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the entire exception stack
+                //Console.WriteLine(ex);
+                //if (ex.InnerException != null)
+                //{
+                //    Console.WriteLine("Inner exception:");
+                //    Console.WriteLine(ex.InnerException.Message);
+                //}
+                throw new Exception(ex.InnerException?.Message);
+                //throw; // Optional: re-throw or handle as needed
             }
             catch (Exception ex)
             {
@@ -109,26 +122,26 @@ namespace GlideGear_backend.Controllers
 
         }
 
-        [HttpPut("update-order-status/{orderId}")]
-        [Authorize(Roles = "admin")]
-        public async Task<ActionResult> UpdateOrderStatus(int orderId, [FromBody] UpdateOrderStatusDto updateOrder)
-        {
-            try
-            {
-                var statusUpdated = await _orderService.UpdateOrderStatus(orderId, updateOrder);
+        //[HttpPut("update-order-status/{orderId}")]
+        //[Authorize(Roles = "admin")]
+        //public async Task<ActionResult> UpdateOrderStatus(int orderId, [FromBody] UpdateOrderStatusDto updateOrder)
+        //{
+        //    try
+        //    {
+        //        var statusUpdated = await _orderService.UpdateOrderStatus(orderId, updateOrder);
 
-                if (statusUpdated)
-                {
-                    return Ok(); 
-                }
+        //        if (statusUpdated)
+        //        {
+        //            return Ok(); 
+        //        }
 
-                return NotFound(); 
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message); 
-            }
-        }
+        //        return NotFound(); 
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, ex.Message); 
+        //    }
+        //}
 
         [HttpGet("totalProductsPurchased")]
         [Authorize(Roles = "admin")]

@@ -1,4 +1,5 @@
-﻿using GlideGear_backend.Models.Dtos;
+﻿using GlideGear_backend.ApiResponse;
+using GlideGear_backend.Models.Dtos;
 using GlideGear_backend.Services.CartServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -25,8 +26,12 @@ namespace GlideGear_backend.Controllers
             {
                 int userId = GetUserIdFromClaims();
 
-                var res = await _cartService.GetCartItems(userId);
-                return Ok(res);
+                var cart = await _cartService.GetCartItems(userId);
+                if (cart.Count == 0)
+                {
+                    return Ok(new ApiResponses<IEnumerable<CartViewDto>>(200, "Cart is empty", cart));
+                }
+                return Ok(new ApiResponses<IEnumerable<CartViewDto>>(200, "Cart successfully fetched", cart));
             }catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
@@ -44,11 +49,12 @@ namespace GlideGear_backend.Controllers
                 bool res=await _cartService.AddToCart(userId, productId);
                 if (res == true)
                 {
-                    return Ok("Product added to cart succesfully");
+                    return Ok(new ApiResponses<bool>(200, "SuccessFully added", res));
                 }
-                return BadRequest("Item already exist");
-                
-            }catch(Exception ex)
+                return BadRequest(new ApiResponses<bool>(400, "Item already in cart", res));
+
+            }
+            catch(Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }

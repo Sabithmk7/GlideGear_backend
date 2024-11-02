@@ -13,7 +13,7 @@ namespace GlideGear_backend.Services.OrderSerices
         Task<decimal> TotalRevenue();
         Task<int> TotalProductsPurchased();
 
-        Task<bool> UpdateOrderStatus(int orderId,UpdateOrderStatusDto value);
+        //Task<bool> UpdateOrderStatus(int orderId,UpdateOrderStatusDto value);
 
     }
 }

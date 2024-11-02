@@ -20,9 +20,11 @@ namespace GlideGear_backend.Models.Order_Model
         [Required]
         public string HomeAddress { get; set; }
         [Required]
-        public string OrderString { get; set; }
+        public decimal Total { get; set; }
         [Required]
-        public string OrderStatus { get; set; }
+        public string OrderString { get; set; }
+        //[Required]
+        //public string OrderStatus { get; set; }
         [Required]
         public string TransactionId { get; set; }
 
