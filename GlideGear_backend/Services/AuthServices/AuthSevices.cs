@@ -67,7 +67,7 @@ namespace GlideGear_backend.Services.Users
                             return new UserResponseDto { Error = "User Blocked" };
                         }
                         var uToken = GenerateToken(u);
-                        return new UserResponseDto { Token = uToken, Role = u.Role, Email = u.Email ,Id=u.Id,Name=u.UserName};
+                        return new UserResponseDto { Token = uToken, Role = u.Role, Email = u.Email, Id = u.Id, Name = u.UserName };
 
                     }
                     return new UserResponseDto { Error = "Invalid password" };
@@ -103,7 +103,7 @@ namespace GlideGear_backend.Services.Users
             var token = new JwtSecurityToken(
                 claims: claim,
                 signingCredentials: credentails,
-                expires: DateTime.UtcNow.AddHours(2)
+                expires: DateTime.UtcNow.AddDays(1)
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);

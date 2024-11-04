@@ -10,6 +10,7 @@ namespace GlideGear_backend.Services.OrderSerices
         Task<bool> CreateOrder(int userId, CreateOrderDto createOrderDto);
         Task<List<OrderViewDto>> GetOrderDetails(int userId);
         Task<List<OrderAdminViewDto>> GetOrderDetailsAdmin();
+        Task<List<OrderUserDetailViewDto>> GetOrdersByUserId(int userId);
         Task<decimal> TotalRevenue();
         Task<int> TotalProductsPurchased();
 

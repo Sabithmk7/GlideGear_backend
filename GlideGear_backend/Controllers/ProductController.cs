@@ -24,7 +24,8 @@ namespace GlideGear_backend.Controllers
             {
                 var products = await _services.GetProducts();
                 return Ok(products);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
@@ -36,7 +37,8 @@ namespace GlideGear_backend.Controllers
             {
                 var p = await _services.GetProductById(id);
                 return Ok(p);
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
@@ -48,7 +50,8 @@ namespace GlideGear_backend.Controllers
             {
                 var p = await _services.GetProductByCategory(categoryName);
                 return Ok(p);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
@@ -66,14 +69,15 @@ namespace GlideGear_backend.Controllers
                     return Ok("Product deleted succesfully");
                 }
                 return BadRequest("No product found");
-                
-            }catch(Exception ex)
+
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [Authorize(Roles ="admin")]
+        [Authorize(Roles = "admin")]
         [HttpPost("Add")]
         public async Task<IActionResult> AddProduct([FromForm] ProductDto productDto, IFormFile image)
         {
@@ -95,13 +99,14 @@ namespace GlideGear_backend.Controllers
 
         [HttpPut("UpdateProduct/{id}")]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> UpdateProduct(int id,[FromForm]ProductDto productDto,IFormFile image)
+        public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductDto productDto, IFormFile image)
         {
             try
             {
                 await _services.UpdateProduct(id, productDto, image);
                 return Ok("Updated seccefully");
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
@@ -113,20 +118,22 @@ namespace GlideGear_backend.Controllers
             {
                 var res = await _services.SearchProduct(search);
                 return Ok(res);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
         [HttpGet("paginated-products")]
-        public async Task<IActionResult> pagination([FromQuery]int pageNumber=1, [FromQuery] int size=10)
+        public async Task<IActionResult> pagination([FromQuery] int pageNumber = 1, [FromQuery] int size = 10)
         {
             try
             {
                 var res = await _services.ProductPagination(pageNumber, size);
                 return Ok(res);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }

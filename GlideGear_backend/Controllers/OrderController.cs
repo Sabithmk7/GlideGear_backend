@@ -1,4 +1,5 @@
-﻿using GlideGear_backend.Models.Order_Model.Dtos;
+﻿using GlideGear_backend.ApiResponse;
+using GlideGear_backend.Models.Order_Model.Dtos;
 using GlideGear_backend.Services.OrderSerices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -105,8 +106,28 @@ namespace GlideGear_backend.Controllers
 
 
         }
-        [HttpGet("get-order-details-admin")]
+        [HttpGet("{userId}")]
         [Authorize(Roles ="admin")]
+        public async Task<ActionResult<List<OrderUserDetailViewDto>>> GetOrderUserById(int userId)
+        {
+            try
+            {
+                var orderDetails = await _orderService.GetOrdersByUserId(userId);
+
+                if (orderDetails == null)
+                    return NotFound(new ApiResponses<string>(404, "Order not found for the specified user"));
+
+                return Ok(new ApiResponses<List<OrderUserDetailViewDto>>(200, "Order details retrieved successfully", orderDetails));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponses<string>(500, "An error occurred while processing your request", null, ex.Message));
+            }
+        }
+
+
+        [HttpGet("get-order-details-admin")]
+        [Authorize(Roles = "admin")]
 
         public async Task<ActionResult> GetOrderDetailsAdmin()
         {

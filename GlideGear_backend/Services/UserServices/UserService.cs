@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using GlideGear_backend.DbContexts;
 using GlideGear_backend.Models.Dtos.UserDtos;
+using GlideGear_backend.Models.User_Model.UserDtos;
 using Microsoft.EntityFrameworkCore;
 
 namespace GlideGear_backend.Services.UserServices
@@ -27,7 +28,22 @@ namespace GlideGear_backend.Services.UserServices
             }
         }
 
-        public async Task<string> BlockAndUnblock(int userId)
+        public async Task<UserViewDto> GetUserById(int userId)
+        {
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                if (user == null)
+                    return null;
+                return _mapper.Map<UserViewDto>(user);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<BlockUnblockResponse> BlockAndUnblock(int userId)
         {
             try
             {
@@ -36,10 +52,15 @@ namespace GlideGear_backend.Services.UserServices
                 {
                     throw new Exception("User not found");
                 }
+
                 user.isBlocked = !user.isBlocked;
                 await _context.SaveChangesAsync();
 
-                return user.isBlocked == true ? "User is blocked" : "User is unblocked";
+                return new BlockUnblockResponse
+                {
+                    IsBlocked = user.isBlocked == true ? true : false,
+                    Message = user.isBlocked == true ? "User is blocked" : "User is unblocked"
+                };
             }
             catch (Exception ex)
             {

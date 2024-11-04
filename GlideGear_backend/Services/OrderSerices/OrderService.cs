@@ -1,4 +1,5 @@
 ﻿using GlideGear_backend.DbContexts;
+using GlideGear_backend.Models.Dtos;
 using GlideGear_backend.Models.Order_Model;
 using GlideGear_backend.Models.Order_Model.Dtos;
 using Microsoft.EntityFrameworkCore;
@@ -198,6 +199,53 @@ namespace GlideGear_backend.Services.OrderSerices
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<List<OrderUserDetailViewDto>> GetOrdersByUserId(int userId)
+        {
+            try
+            {
+                var orders = await _context.Orders
+                    .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                    .Where(o => o.userId == userId)
+                    .ToListAsync(); // Use ToListAsync to fetch multiple orders
+
+                // If no orders are found, return an empty list instead of null
+                if (orders == null || !orders.Any())
+                    return new List<OrderUserDetailViewDto>();
+
+                var orderDetails = orders.Select(orders => new OrderUserDetailViewDto
+                {
+                    Id = orders.Id,
+                    CustomerEmail = orders.CustomerEmail,
+                    CustomerName = orders.CustomerName,
+                    CustomerCity = orders.CustomerCity,
+                    CustomerPhone = orders.CustomerPhone,
+                    OrderId = orders.OrderString,
+                    HomeAddress = orders.HomeAddress,
+                    TransactionId = orders.TransactionId,
+                    OrderDate = orders.OrderDate,
+                    OrderProducts = orders.OrderItems.Select(oi => new CartViewDto
+                    {
+                        ProductId = oi.ProductId,
+                        ProductName = oi.Product.Title,
+                        Price = oi.Product.Price,
+                        Quantity = oi.Quantity,
+                        TotalAmount = oi.TotalPrice,
+                        ProductImage = oi.Product.Img
+                    }).ToList()
+                }).ToList(); // Convert to list
+
+                return orderDetails;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+
 
         //public async Task<bool> UpdateOrderStatus(int orderId, UpdateOrderStatusDto value)
         //{
