@@ -55,6 +55,7 @@ namespace GlideGear_backend.Services.WhishListServices
                     var p = items.Select(w => new WhishListViewDto
                     {
                         Id = w.Id,
+                        ProductId=w.Products.ProductId,
                         ProductName = w.Products.Title,
                         ProductDescription = w.Products.Description,
                         Price = w.Products.Price,

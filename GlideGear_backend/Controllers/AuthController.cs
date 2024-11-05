@@ -62,8 +62,8 @@ namespace GlideGear_backend.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = false, 
-                    SameSite = SameSiteMode.None,
+                    Secure = true, 
+                    SameSite = SameSiteMode.Lax,
                     Expires = DateTime.UtcNow.AddHours(1)
                 };
 

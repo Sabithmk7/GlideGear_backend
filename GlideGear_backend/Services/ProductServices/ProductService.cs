@@ -96,6 +96,20 @@ namespace GlideGear_backend.Services.ProductServices
         {
             try
             {
+                if (categoryName == "All")
+                {
+                    var prod = await _context.Products.Include(p => p.Category).ToListAsync();
+                    var pr = prod.Select(p => new ProductViewDto
+                    {
+                        Id = p.ProductId,
+                        Title = p.Title,
+                        Description = p.Description,
+                        ProductImage=p.Img,
+                        Price = p.Price,
+                        Category = p.Category.Name,
+                    }).ToList();
+                    return pr;
+                }
                 var products = await _context.Products.Include(p => p.Category)
                     .Where(p => p.Category.Name == categoryName)
                     .Select(p => new ProductViewDto
@@ -170,26 +184,31 @@ namespace GlideGear_backend.Services.ProductServices
             }
         }
 
-        
+
 
         public async Task<List<ProductViewDto>> SearchProduct(string search)
         {
+            
+
+            if (string.IsNullOrEmpty(search))
+            { 
+                 return new List<ProductViewDto>();
+            }
+
+           
             var products = await _context.Products.Include(x => x.Category)
                 .Where(p => p.Title.ToLower().Contains(search.ToLower()))
                 .ToListAsync();
-            if (products != null)
+
+            return products.Select(s => new ProductViewDto
             {
-                return products.Select(s => new ProductViewDto
-                {
-                    Id = s.ProductId,
-                    Title = s.Title,
-                    Description = s.Description,
-                    Price = s.Price,
-                    ProductImage = s.Img,
-                    Category = s.Category.Name
-                }).ToList();
-            }
-            return new List<ProductViewDto>();
+                Id = s.ProductId,
+                Title = s.Title,
+                Description = s.Description,
+                Price = s.Price,
+                ProductImage = s.Img,
+                Category = s.Category.Name
+            }).ToList();
         }
 
         public async Task<List<ProductViewDto>> ProductPagination(int pageNumber = 1, int size = 10)

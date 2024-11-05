@@ -68,7 +68,7 @@ namespace GlideGear_backend.Controllers
                 {
                     return Ok("Product deleted succesfully");
                 }
-                return BadRequest("No product found");
+                return NotFound("No product found");
 
             }
             catch (Exception ex)
