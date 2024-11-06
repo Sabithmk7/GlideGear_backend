@@ -1,4 +1,6 @@
-﻿using GlideGear_backend.Services.WhishListServices;
+﻿using GlideGear_backend.ApiResponse;
+using GlideGear_backend.Models.WhishList_Model.Dto;
+using GlideGear_backend.Services.WhishListServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,13 +25,14 @@ namespace GlideGear_backend.Controllers
             try
             {
 
-                int userId = GetUserIdFromClaims();
+                int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
                 var res = await _whishListService.GetWhishList(userId);
-                return Ok(res);
+                
+                return Ok(new ApiResponses<List<WhishListViewDto>>(200,"Whishlist fetched correctly",res));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500,new ApiResponses<string>(500, "Failed to fetch wishlist",null, ex.Message));
             }
         }
 
@@ -39,26 +42,15 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                int userId = GetUserIdFromClaims();
+                int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
                 string res = await _whishListService.AddOrRemove(userId, productId);
-                return Ok(res);
+                return Ok(new ApiResponses<string>(200,res));
 
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new ApiResponses<string>(500,"Operation on wishlist failed",null,ex.Message));
             }
         }
-
-        private int GetUserIdFromClaims()
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (int.TryParse(userIdString, out int userId))
-            {
-                return userId;
-            }
-            throw new Exception("Invalid user ID.");
-        }
-
     }
 }

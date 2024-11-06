@@ -15,9 +15,11 @@ namespace GlideGear_backend.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthServices _authServices;
-        public AuthController(IAuthServices authServices)
+        private readonly ILogger<AuthController> _logger;
+        public AuthController(IAuthServices authServices, ILogger<AuthController> logger)
         {
             _authServices = authServices;
+            _logger = logger;
         }
 
         [HttpPost("Register")]
@@ -46,6 +48,7 @@ namespace GlideGear_backend.Controllers
             try
             {
                 var res = await _authServices.Login(login);
+                _logger.LogInformation($" result is {res}");
                 if (res.Error == "Not Found")
                 {
                     return NotFound(new ApiResponses<string>(404, "NotFound", null, "Please SignUp, user not found"));
@@ -58,35 +61,12 @@ namespace GlideGear_backend.Controllers
                 {
                     return BadRequest(new ApiResponses<string>(400, "BadRequest", null, res.Error));
                 }
-                
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true, 
-                    SameSite = SameSiteMode.Lax,
-                    Expires = DateTime.UtcNow.AddHours(1)
-                };
 
-                Response.Cookies.Append("AuthToken", res.Token, cookieOptions);
                 return Ok(new ApiResponses<UserResponseDto>(200, "Login successfully", res));
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new ApiResponses<string>(500, "Internal server issue", null, ex.Message)); ;
-            }
-        }
-
-        [HttpGet("logout")]
-        public IActionResult Logout()
-        {
-            try
-            {
-                Response.Cookies.Delete("AuthToken");
-                return Ok("User Logged out");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
             }
         }
     }

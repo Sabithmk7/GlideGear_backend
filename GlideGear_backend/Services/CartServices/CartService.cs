@@ -28,7 +28,7 @@ namespace GlideGear_backend.Services.CartServices
 
                 var user = await _context.Carts.Include(ci => ci.CartItems).ThenInclude(p => p.Product)
                     .FirstOrDefaultAsync(x => x.UserId == userId);
-                _logger.LogInformation($"{user}");
+                //_logger.LogInformation($"{user}");
 
                 if (user != null)
                 {
@@ -39,7 +39,7 @@ namespace GlideGear_backend.Services.CartServices
                         Quantity = c.Quantity,
                         Price = c.Product.Price,
                         TotalAmount = c.Product.Price * c.Quantity,
-                        ProductImage = c.Product.Img // Removed HostUrl concatenation
+                        ProductImage = c.Product.Img 
                     }).ToList();
                 }
                 return new List<CartViewDto>();
@@ -107,7 +107,7 @@ namespace GlideGear_backend.Services.CartServices
                     throw new Exception("User is not found");
                 }
 
-                var deleteItem = user.Cart.CartItems.FirstOrDefault(p => p.ProductId == productId);
+                var deleteItem = user?.Cart?.CartItems?.FirstOrDefault(p => p.ProductId == productId);
                 if (deleteItem == null)
                 {
                     return false;
@@ -171,10 +171,13 @@ namespace GlideGear_backend.Services.CartServices
                 {
                     return false;
                 }
-                item.Quantity--;
-                if (item.Quantity < 1)
+                if (item.Quantity > 1)
                 {
-                    user.Cart.CartItems.Remove(item);
+                    item.Quantity--;
+                }
+                else
+                {
+                    item.Quantity = 1;
                 }
                 await _context.SaveChangesAsync();
                 return true;

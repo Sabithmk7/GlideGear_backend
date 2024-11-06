@@ -5,6 +5,7 @@ using GlideGear_backend.Models.Dtos.UserDtos;
 using GlideGear_backend.Models.User_Model.UserDtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Razorpay.Api;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -16,11 +17,13 @@ namespace GlideGear_backend.Services.Users
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
-        public AuthSevices(ApplicationDbContext context, IMapper mapper, IConfiguration configuration)
+        private readonly ILogger<AuthSevices> _logger;
+        public AuthSevices(ApplicationDbContext context, IMapper mapper, IConfiguration configuration, ILogger<AuthSevices> logger)
         {
             _context = context;
             _mapper = mapper;
             _configuration = configuration;
+            _logger = logger;
         }
 
 
@@ -56,32 +59,49 @@ namespace GlideGear_backend.Services.Users
         {
             try
             {
-                var u = await _context.Users.SingleOrDefaultAsync(x => x.Email == user.Email);
-                if (u != null)
-                {
-                    var pass = ValidatePassword(user.Password, u.Password);
-                    if (pass)
-                    {
-                        if (u.isBlocked == true)
-                        {
-                            return new UserResponseDto { Error = "User Blocked" };
-                        }
-                        var uToken = GenerateToken(u);
-                        return new UserResponseDto { Token = uToken, Role = u.Role, Email = u.Email, Id = u.Id, Name = u.UserName };
+                _logger.LogInformation("Attempting to log in user...");
 
-                    }
+                var u = await _context.Users.SingleOrDefaultAsync(x => x.Email == user.Email);
+                if (u == null)
+                {
+                    _logger.LogWarning("User not found.");
+                    return new UserResponseDto { Error = "Not Found" };
+                }
+
+                _logger.LogInformation("User found. Validating password...");
+                var pass = ValidatePassword(user.Password, u.Password);
+
+                if (!pass)
+                {
+                    _logger.LogWarning("Invalid password.");
                     return new UserResponseDto { Error = "Invalid password" };
                 }
-                return new UserResponseDto { Error = "Not Found" };
 
+                if (u.isBlocked==true)
+                {
+                    _logger.LogWarning("User is blocked.");
+                    return new UserResponseDto { Error = "User Blocked" };
+                }
+
+                _logger.LogInformation("Generating token...");
+                var uToken = GenerateToken(u);
+
+                return new UserResponseDto
+                {
+                    Token = uToken,
+                    Role = u.Role,
+                    Email = u.Email,
+                    Id = u.Id,
+                    Name = u.UserName
+                };
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                _logger.LogError($"Error in Login method: {ex.Message}");
+                throw;
             }
-
-
         }
+
 
 
 

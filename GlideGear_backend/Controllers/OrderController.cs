@@ -77,7 +77,7 @@ namespace GlideGear_backend.Controllers
             try
             {
 
-                int userId = GetUserIdFromClaims();
+                int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
                 var status = await _orderService.CreateOrder(userId, orderCreate);
                 return Ok(status);
             }
@@ -95,7 +95,7 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                int userId = GetUserIdFromClaims();
+                int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
                 return Ok(await _orderService.GetOrderDetails(userId));
 
             }
@@ -190,15 +190,15 @@ namespace GlideGear_backend.Controllers
                 return StatusCode(500, e.Message);
             }
         }
-        private int GetUserIdFromClaims()
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (int.TryParse(userIdString, out int userId))
-            {
-                return userId;
-            }
-            throw new Exception("Invalid user ID.");
-        }
+        //private int GetUserIdFromClaims()
+        //{
+        //    var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //    if (int.TryParse(userIdString, out int userId))
+        //    {
+        //        return userId;
+        //    }
+        //    throw new Exception("Invalid user ID.");
+        //}
 
     }
 }

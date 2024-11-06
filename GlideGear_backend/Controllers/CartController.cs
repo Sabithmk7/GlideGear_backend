@@ -24,7 +24,7 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                int userId = GetUserIdFromClaims();
+                int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
 
                 var cart = await _cartService.GetCartItems(userId);
                 if (cart.Count == 0)
@@ -34,7 +34,7 @@ namespace GlideGear_backend.Controllers
                 return Ok(new ApiResponses<IEnumerable<CartViewDto>>(200, "Cart successfully fetched", cart));
             }catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new ApiResponses<string>(500, "Internal server error",null, ex.Message));
             }
         }
 
@@ -44,7 +44,7 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                int userId = GetUserIdFromClaims();
+                int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
 
                 bool res=await _cartService.AddToCart(userId, productId);
                 if (res == true)
@@ -56,7 +56,7 @@ namespace GlideGear_backend.Controllers
             }
             catch(Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new ApiResponses<string>(500, "Internal server error", null, ex.Message));
             }
         }
 
@@ -66,17 +66,17 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                int userId = GetUserIdFromClaims();
+                int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
 
                 bool res = await _cartService.RemoveFromCart(userId, productId);
                 if (res == false)
                 {
-                    return BadRequest("Item is not found in cart");
+                    return BadRequest(new ApiResponses<string>(400, "Item is not found in cart",null, "Item is not found in cart"));
                 }
-                return Ok("Item successfully deleted");
+                return Ok(new ApiResponses<string>(200, "Item successfully deleted"));
             }catch(Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new ApiResponses<string>(500, "Internal server error", null, ex.Message));
             }
         }
 
@@ -86,17 +86,17 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                int userId = GetUserIdFromClaims();
+                int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
                 bool res=await _cartService.IncreaseQuantity(userId, productId);
                 if(res == false)
                 {
-                    return BadRequest("Item not found in the cart");
+                    return BadRequest(new ApiResponses<string>(400, "Item not found in the cart",null, "Item not found in the cart"));
                 }
-                return Ok("Qty increased");
+                return Ok(new ApiResponses<string>(200, "Qty increased"));
             }
             catch(Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new ApiResponses<string>(500, "Internal server error", null, ex.Message));
             }
         }
 
@@ -106,28 +106,20 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
-                int userId = GetUserIdFromClaims();
+                int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
 
                 bool res = await _cartService.DecreaseQuantity(userId, productId);
                 if (res == false)
                 {
-                    return BadRequest("Item not found in the cart");
+                    return BadRequest(new ApiResponses<string>(400, "Item not found in the cart", null, "Item not found in the cart"));
                 }
-                return Ok("Qty decreased");
+                return Ok(new ApiResponses<string>(200, "Qty decreased"));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new ApiResponses<string>(500, "Internal server error", null, ex.Message));
             }
         }
-        private int GetUserIdFromClaims()
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (int.TryParse(userIdString, out int userId))
-            {
-                return userId;
-            }
-            throw new Exception("Invalid user ID.");
-        }
+
     }
 }
