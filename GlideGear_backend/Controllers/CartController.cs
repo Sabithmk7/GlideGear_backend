@@ -46,7 +46,7 @@ namespace GlideGear_backend.Controllers
             {
                 int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
 
-                bool res=await _cartService.AddToCart(userId, productId);
+                bool res=await _cartService.AddToCart(userId, productId);   
                 if (res == true)
                 {
                     return Ok(new ApiResponses<bool>(200, "SuccessFully added", res));

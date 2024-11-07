@@ -74,13 +74,10 @@ namespace GlideGear_backend.Services.OrderSerices
         {
             try
             {
-                //if (createOrderDto.TransactionId == null && createOrderDto.OrderString == null)
-                //{
-                //    return false;
-                //}
+      
 
                 var cart = await _context.Carts.Include(c => c.CartItems).ThenInclude(p => p.Product).FirstOrDefaultAsync(u => u.UserId == userId);
-                //decimal sum = cart.CartItems.Sum(s => s.Product.Price * s.Quantity);
+
                 var order = new OrderMain
                 {
                     userId = userId,
@@ -93,9 +90,6 @@ namespace GlideGear_backend.Services.OrderSerices
                     Total=createOrderDto.Total,
                     OrderString=createOrderDto.OrderString,
                     TransactionId=createOrderDto.TransactionId,
-
-
-                    //OrderString = createOrderDto.OrderString,
                     OrderItems = cart.CartItems.Select(ci => new OrderItem
                     {
                         ProductId = ci.ProductId,
@@ -110,15 +104,9 @@ namespace GlideGear_backend.Services.OrderSerices
             }
             catch (DbUpdateException ex)
             {
-                // Log the entire exception stack
-                //Console.WriteLine(ex);
-                //if (ex.InnerException != null)
-                //{
-                //    Console.WriteLine("Inner exception:");
-                //    Console.WriteLine(ex.InnerException.Message);
-                //}
+           
                 throw new Exception(ex.InnerException?.Message);
-                //throw; // Optional: re-throw or handle as needed
+              
             }
             catch (Exception ex)
             {
@@ -141,11 +129,11 @@ namespace GlideGear_backend.Services.OrderSerices
                         Id = item.ProductId,
                         OrderDate = order.OrderDate,
                         ProductName = item.Product.Title,
-                        ProductImage = item.Product.Img, // Use image URL directly
+                        ProductImage = item.Product.Img, 
                         Quantity = item.Quantity,
                         TotalPrice = item.TotalPrice,
                         OrderId = order.OrderString,
-                        //OrderStatus = order.OrderStatus,
+ 
                     };
                     OrderDetails.Add(OrderDetail);
                 }
@@ -167,7 +155,6 @@ namespace GlideGear_backend.Services.OrderSerices
                     OrderId = o.OrderString,
                     TransactionId = o.TransactionId,
                     OrderDate = o.OrderDate,
-                    //OrderStatus = o.OrderStatus
                 }).ToList();
                 return orderDetails;
             }
@@ -208,9 +195,9 @@ namespace GlideGear_backend.Services.OrderSerices
                     .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
                     .Where(o => o.userId == userId)
-                    .ToListAsync(); // Use ToListAsync to fetch multiple orders
+                    .ToListAsync();
 
-                // If no orders are found, return an empty list instead of null
+           
                 if (orders == null || !orders.Any())
                     return new List<OrderUserDetailViewDto>();
 
@@ -234,7 +221,7 @@ namespace GlideGear_backend.Services.OrderSerices
                         TotalAmount = oi.TotalPrice,
                         ProductImage = oi.Product.Img
                     }).ToList()
-                }).ToList(); // Convert to list
+                }).ToList();
 
                 return orderDetails;
             }
@@ -246,18 +233,5 @@ namespace GlideGear_backend.Services.OrderSerices
 
 
 
-
-        //public async Task<bool> UpdateOrderStatus(int orderId, UpdateOrderStatusDto value)
-        //{
-        //    var order = await _context.Orders.FindAsync(orderId);
-
-        //    if (order != null)
-        //    {
-        //        order.OrderStatus = value.OrderStatus;
-        //        await _context.SaveChangesAsync();
-        //        return true;
-        //    }
-        //    return false;
-        //}
     }
 }

@@ -142,7 +142,12 @@ namespace GlideGear_backend.Services.CartServices
                 {
                     return false;
                 }
-                item.Quantity++;
+                if (item.Quantity < 10)
+                {
+                    item.Quantity++;  
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
                 await _context.SaveChangesAsync();
                 return true;
             }
