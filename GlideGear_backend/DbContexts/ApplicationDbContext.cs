@@ -29,8 +29,6 @@ namespace GlideGear_backend.DbContexts
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-            //auth
             modelBuilder.Entity<User>()
                 .Property(e => e.Role)
                 .HasDefaultValue("user");

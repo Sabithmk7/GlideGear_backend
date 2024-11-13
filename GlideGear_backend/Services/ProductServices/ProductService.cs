@@ -35,7 +35,8 @@ namespace GlideGear_backend.Services.ProductServices
                         Description = p.Description,
                         Price = p.Price,
                         ProductImage = p.Img, 
-                        Category = p.Category.Name
+                        Category = p.Category.Name,
+                        Stock=p.Stock
                     }).ToList();
                     return productWithCategory;
                 }
@@ -83,7 +84,8 @@ namespace GlideGear_backend.Services.ProductServices
                     Description = prd.Description,
                     Price = prd.Price,
                     ProductImage = prd.Img,
-                    Category = prd.Category.Name
+                    Category = prd.Category.Name,
+                    Stock=prd.Stock
                 };
             }
             catch (Exception ex)
@@ -107,6 +109,7 @@ namespace GlideGear_backend.Services.ProductServices
                         ProductImage=p.Img,
                         Price = p.Price,
                         Category = p.Category.Name,
+                        Stock=p.Stock
                     }).ToList();
                     return pr;
                 }
@@ -119,7 +122,8 @@ namespace GlideGear_backend.Services.ProductServices
                         Description = p.Description,
                         Price = p.Price,
                         ProductImage = p.Img,
-                        Category = p.Category.Name
+                        Category = p.Category.Name,
+                        Stock=p.Stock
                     }).ToListAsync();
 
                 return products;
@@ -165,6 +169,7 @@ namespace GlideGear_backend.Services.ProductServices
                     product.Description = productDto.Description;
                     product.Price = productDto.Price;
                     product.CategoryId = productDto.CategoryId;
+                    product.Stock = productDto.Stock;
 
                     if (image != null && image.Length > 0)
                     {
@@ -207,7 +212,8 @@ namespace GlideGear_backend.Services.ProductServices
                 Description = s.Description,
                 Price = s.Price,
                 ProductImage = s.Img,
-                Category = s.Category.Name
+                Category = s.Category.Name,
+                Stock=s.Stock
             }).ToList();
         }
 
@@ -228,7 +234,9 @@ namespace GlideGear_backend.Services.ProductServices
                     Description = p.Description,
                     Price = p.Price,
                     ProductImage = p.Img,
-                    Category = p.Category.Name
+                    Category = p.Category.Name,
+                    Stock=p.Stock
+
                 }).ToList();
             }
             catch (Exception ex)

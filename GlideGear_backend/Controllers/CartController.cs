@@ -40,22 +40,33 @@ namespace GlideGear_backend.Controllers
 
         [HttpPost("add/{productId}")]
         [Authorize]
-        public async Task<IActionResult> Addtocart(int productId)
+        public async Task<IActionResult> AddToCart(int productId)
         {
             try
             {
                 int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
 
-                bool res=await _cartService.AddToCart(userId, productId);   
-                if (res == true)
-                {
-                    return Ok(new ApiResponses<bool>(200, "SuccessFully added", res));
-                }
-                return BadRequest(new ApiResponses<bool>(400, "Item already in cart", res));
+                
+                var res = await _cartService.AddToCart(userId, productId);
 
+
+                if (res.StatusCode == 200)
+                {
+                    return Ok(res); 
+                }
+                else if (res.StatusCode == 404)
+                {
+                    return NotFound(new ApiResponses<string>(404, res.Message));
+                }
+                else if (res.StatusCode == 409)
+                {
+                    return Conflict(new ApiResponses<string>(409, res.Message)); 
+                }
+                return BadRequest(new ApiResponses<string>(400, "Bad request"));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
+                
                 return StatusCode(500, new ApiResponses<string>(500, "Internal server error", null, ex.Message));
             }
         }
@@ -86,19 +97,28 @@ namespace GlideGear_backend.Controllers
         {
             try
             {
+
                 int userId = Convert.ToInt32(HttpContext.Items["UserId"]);
-                bool res=await _cartService.IncreaseQuantity(userId, productId);
-                if(res == false)
+
+                var res = await _cartService.IncreaseQuantity(userId, productId);
+
+                if (res.StatusCode == 404) 
                 {
-                    return BadRequest(new ApiResponses<string>(400, "Item not found in the cart",null, "Item not found in the cart"));
+                    return BadRequest(new ApiResponses<string>(404, res.Message, null, res.Error));
                 }
-                return Ok(new ApiResponses<string>(200, "Qty increased"));
+
+                if (res.StatusCode == 400)
+                {
+                    return BadRequest(new ApiResponses<string>(400, res.Message, null, res.Error));
+                }
+                return Ok(new ApiResponses<string>(200, "Quantity increased successfully"));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, new ApiResponses<string>(500, "Internal server error", null, ex.Message));
             }
         }
+
 
         [HttpPut("DecreaseQty/{productId}")]
         [Authorize]

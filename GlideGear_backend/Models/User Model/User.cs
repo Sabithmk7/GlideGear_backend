@@ -20,6 +20,7 @@ namespace GlideGear_backend.Models
         public string? Password { get; set; }
         public string? Role {  get; set; }
         public bool? isBlocked { get; set; }
+
         public virtual Cart? Cart { get; set; }
         public virtual List<OrderMain> Orders { get; set; }
         public virtual List<WhishList> WhishLists { get; set; }

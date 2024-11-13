@@ -16,6 +16,8 @@ namespace GlideGear_backend.Models
         [Url(ErrorMessage = "Invalid URL format.")]
         public string? Img { get; set; }
         [Required]
+        public int Stock { get; set; }
+        [Required]
         public int CategoryId { get; set; }
         public virtual Category? Category { get; set; }
         public virtual List<CartItem>? CartItems { get; set; }

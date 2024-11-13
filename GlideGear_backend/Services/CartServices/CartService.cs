@@ -1,4 +1,5 @@
-﻿using GlideGear_backend.DbContexts;
+﻿using GlideGear_backend.ApiResponse;
+using GlideGear_backend.DbContexts;
 using GlideGear_backend.Models;
 using GlideGear_backend.Models.Dtos;
 using GlideGear_backend.Services.JwtService;
@@ -39,7 +40,7 @@ namespace GlideGear_backend.Services.CartServices
                         Quantity = c.Quantity,
                         Price = c.Product.Price,
                         TotalAmount = c.Product.Price * c.Quantity,
-                        ProductImage = c.Product.Img 
+                        ProductImage = c.Product.Img
                     }).ToList();
                 }
                 return new List<CartViewDto>();
@@ -50,19 +51,21 @@ namespace GlideGear_backend.Services.CartServices
             }
         }
 
-        public async Task<bool> AddToCart(int userId, int productId)
+        public async Task<ApiResponses<CartItem>> AddToCart(int userId, int productId)
         {
             try
             {
+
                 var user = await _context.Users.Include(c => c.Cart)
-                                .ThenInclude(ci => ci.CartItems)
-                                .ThenInclude(p => p.Product)
-                                .FirstOrDefaultAsync(u => u.Id == userId);
+                                 .ThenInclude(ci => ci.CartItems)
+                                 .ThenInclude(p => p.Product)
+                                 .FirstOrDefaultAsync(u => u.Id == userId);
 
                 if (user == null)
                 {
-                    throw new Exception("User not found");
+                    return new ApiResponses<CartItem>(404, "User not found");
                 }
+
                 if (user.Cart == null)
                 {
                     user.Cart = new Cart { UserId = userId, CartItems = new List<CartItem>() };
@@ -70,11 +73,19 @@ namespace GlideGear_backend.Services.CartServices
                     await _context.SaveChangesAsync();
                 }
 
+
                 var check = user.Cart?.CartItems?.FirstOrDefault(p => p.ProductId == productId);
                 if (check != null)
                 {
-                    return false;
+                    return new ApiResponses<CartItem>(409, "Product already in cart");
                 }
+                var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == productId);
+                if (product?.Stock <= 0)
+                {
+
+                    return new ApiResponses<CartItem>(404, "Out of stock");
+                }
+
 
                 var item = new CartItem
                 {
@@ -85,13 +96,17 @@ namespace GlideGear_backend.Services.CartServices
 
                 user?.Cart?.CartItems?.Add(item);
                 await _context.SaveChangesAsync();
-                return true;
+
+
+                return new ApiResponses<CartItem>(200, "Successfully added to cart");
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+
+                return new ApiResponses<CartItem>(500, "Internal server error", null, ex.Message);
             }
         }
+
 
         public async Task<bool> RemoveFromCart(int userId, int productId)
         {
@@ -123,39 +138,54 @@ namespace GlideGear_backend.Services.CartServices
             }
         }
 
-        public async Task<bool> IncreaseQuantity(int userId, int productId)
+        public async Task<ApiResponses<CartItem>> IncreaseQuantity(int userId, int productId)
         {
             try
             {
                 var user = await _context.Users.Include(c => c.Cart)
-                                    .ThenInclude(ci => ci.CartItems)
-                                    .ThenInclude(p => p.Product)
-                                    .FirstOrDefaultAsync(u => u.Id == userId);
+                                   .ThenInclude(ci => ci.CartItems)
+                                   .ThenInclude(p => p.Product)
+                                   .FirstOrDefaultAsync(u => u.Id == userId);
 
                 if (user == null)
                 {
-                    throw new Exception("User not found");
+                    return new ApiResponses<CartItem>(404, "User not found");
+                }
+
+                var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == productId);
+                if (product == null)
+                {
+                    return new ApiResponses<CartItem>(404, "Product not found");
                 }
 
                 var item = user.Cart.CartItems.FirstOrDefault(p => p.ProductId == productId);
                 if (item == null)
                 {
-                    return false;
+                    return new ApiResponses<CartItem>(404, "Product not found in cart");
                 }
-                if (item.Quantity < 10)
+
+
+                if (item.Quantity >= 10)
                 {
-                    item.Quantity++;  
-                    await _context.SaveChangesAsync();
-                    return true;
+                    return new ApiResponses<CartItem>(400, "Maximum quantity reached (10 items)");
                 }
+
+                if (product.Stock <= item.Quantity)
+                {
+                    return new ApiResponses<CartItem>(400, "Out of stock!");
+                }
+
+                item.Quantity++;
                 await _context.SaveChangesAsync();
-                return true;
+
+                return new ApiResponses<CartItem>(200, "Quantity increased successfully", item);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return new ApiResponses<CartItem>(500, "Internal server error", null, ex.Message);
             }
         }
+
 
         public async Task<bool> DecreaseQuantity(int userId, int productId)
         {

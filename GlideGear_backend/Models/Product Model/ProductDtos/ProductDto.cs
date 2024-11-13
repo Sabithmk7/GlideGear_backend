@@ -15,5 +15,7 @@ namespace GlideGear_backend.Models.Dtos.ProductDtos
 
         [Required]
         public int CategoryId { get; set; }
+        [Required]
+        public int Stock { get; set; }
     }
 }

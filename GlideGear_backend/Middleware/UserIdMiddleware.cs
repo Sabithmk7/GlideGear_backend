@@ -24,7 +24,6 @@ namespace GlideGear_backend.Middleware
 
                 if (idClaim != null)
                 {
-                    //_logger.LogInformation($"User ID: {idClaim.Value}");
                     context.Items["UserId"] = idClaim.Value; 
                 }
                 else

@@ -74,10 +74,11 @@ namespace GlideGear_backend.Services.OrderSerices
         {
             try
             {
-      
-
-                var cart = await _context.Carts.Include(c => c.CartItems).ThenInclude(p => p.Product).FirstOrDefaultAsync(u => u.UserId == userId);
-
+                var cart = await _context.Carts?.Include(c => c.CartItems).ThenInclude(p => p.Product).FirstOrDefaultAsync(u => u.UserId == userId);
+                if (cart == null)
+                {
+                    throw new Exception("Cart is empty");
+                }
                 var order = new OrderMain
                 {
                     userId = userId,
@@ -97,6 +98,20 @@ namespace GlideGear_backend.Services.OrderSerices
                         TotalPrice = ci.Quantity * ci.Product.Price
                     }).ToList()
                 };
+
+                foreach (var cartItem in cart.CartItems)
+                {
+                    var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == cartItem.ProductId);
+                    if (product != null)
+                        if (product.Stock < cartItem.Quantity)
+                        {
+                            return false;
+                        }
+
+                    product.Stock -= cartItem.Quantity;
+
+                }
+
                 await _context.Orders.AddAsync(order);
                 _context.Carts.Remove(cart);
                 await _context.SaveChangesAsync();
